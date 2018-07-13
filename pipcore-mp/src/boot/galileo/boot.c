@@ -168,11 +168,11 @@ int c_main(struct multiboot *mbootPtr)
 
 	// Initialize free page list
 	DEBUG(INFO, "-> Initializing paging.\r\n");
-	dumpMmap((uint32_t*)mbootPtr->mmap_addr, mbootPtr->mmap_length);
+	uint32_t ram_end = dumpMmap((uint32_t*)mbootPtr->mmap_addr, mbootPtr->mmap_length);
 
 	// Install and test MMU
 	DEBUG(INFO, "-> Initializing MMU.\r\n");
-	initMmu();
+	initMmu(ram_end);
 
 	DEBUG(INFO, "-> Now spawning multiplexer in userland.\r\n");
 	spawnFirstPartition();

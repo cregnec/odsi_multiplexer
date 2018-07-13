@@ -23,6 +23,7 @@ ARCHDEF=$(shell echo $(ARCH) | tr a-z A-Z)
 VARIANTDEF=$(shell echo $(VARIANT) | tr a-z A-Z)
 CFLAGS+=-DARCH_$(ARCHDEF)
 CFLAGS+=-DVARIANT_$(VARIANTDEF)
+CFLAGS+=-DLOGLEVEL=TRACE
 
 .PHONY: info all
 
@@ -31,7 +32,7 @@ all: info $(LIBDIR) $(LIB)
 info:
 	@echo Building LibPip2 for architecture $(ARCH), variant $(VARIANT).
 
-clean: 
+clean:
 	rm -rf $(LIBDIR) $(OBJ) $(AOBJ)
 
 $(LIBDIR):

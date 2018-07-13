@@ -67,7 +67,7 @@ int printf(const char *format, ...);
 
 
 #ifndef LOGLEVEL
-#define LOGLEVEL INFO
+#define LOGLEVEL TRACE
 #endif
 
 /**

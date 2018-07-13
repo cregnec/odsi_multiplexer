@@ -1,6 +1,6 @@
 # Edit this to suit your needs, and copy to toolchain.mk.
 
-CC=gcc
+CC=nasm
 LD=ld
 AS=gcc
 LIBPIP=/home/dev/LibPip/

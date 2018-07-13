@@ -91,6 +91,7 @@ COBJ=$(FULLCSOURCES:.c=.o)
 AOBJ=$(ASOURCES:.s=.o)
 COBJ+=$(TARGET_DIR)/multiplexer.o
 
+
 # And tamper with it
 COBJ:=$(patsubst %,$(TARGET_DIR)/%, $(notdir $(COBJ)))
 AOBJ:=$(patsubst %,$(TARGET_DIR)/%, $(notdir $(AOBJ)))
@@ -103,7 +104,7 @@ CFLAGS+=-I$(SRC_DIR)/IAL/$(TARGET)
 CFLAGS+=-I$(SRC_DIR)/boot/$(TARGET)/include
 CFLAGS+=-I$(TARGET_DIR)/
 
-all: kernel proofs doc 
+all: kernel proofs doc
 
 kernel: gitinfo $(TARGET_DIR) linker makefile.dep extract $(COBJ) $(AOBJ)
 	$(LD) $(AOBJ) $(COBJ) $(LDFLAGS) -T$(SRC_DIR)/boot/$(TARGET)/link.ld -o $(TARGET_DIR)/meso.bin
@@ -177,7 +178,7 @@ extract: $(DIGGER) $(TARGET_DIR) $(JSONS)
 	    -q maldefines.h -q Services.h                                 \
 	    --ignore coq_N                                                \
 	    ServicesHandler.json                                          \
-	     | $(SED) -e "s/Services_//g" > $(TARGET_DIR)/ServicesHandler.c	
+	     | $(SED) -e "s/Services_//g" > $(TARGET_DIR)/ServicesHandler.c
 
 proofs: $(VOBJECTS)
 
@@ -216,6 +217,10 @@ $(addsuffix .d,$(VSOURCES)): %.v.d: %.v
 $(VSOURCES:.v=.glob): %.glob: %.vo
 
 # This rule generates and builds an object file from the given partition binary
+$(TARGET_DIR)/.o: $(TARGET_DIR)/partition_freertos.o
+	$(CC) $(CFLAGS) -o $@ $(SRC_DIR)/boot/$(TARGET)/multiplexer.c
+
+# This rule generates and builds an object file from the given partition binary
 $(TARGET_DIR)/multiplexer.o: $(TARGET_DIR)/$(PARTITION).bin
 	printf "section .multiplexer\n\tINCBIN \"$<\"\n" > $(TARGET_DIR)/multiplexer.s
 	$(AS) $(ASFLAGS) -o $@ $(TARGET_DIR)/multiplexer.s
@@ -250,7 +255,7 @@ doc: doc-c doc-coq gettingstarted doc/Readme.html doc/PipInternals.html
 doc-c:
 	cd doc && doxygen doxygen.conf
 
-gettingstarted: 
+gettingstarted:
 	cd doc/GettingStarted && pdflatex GettingStarted.tex
 
 doc-coq: $(VSOURCES) $(VSOURCES:.v=.glob)
@@ -281,13 +286,13 @@ clean-coq:
 	rm -f $(VOBJECTS) $(VSOURCES:.v=.v.d) $(VSOURCES:.v=.glob)
 
 clean-c:
-	rm -rf $(TARGET_DIR)/
+	rm -rf $(TARGET_DIR)/*
 
 clean-mddoc:
 	rm -f doc/*.html
 
 mrproper: clean-c clean-coq
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR)/*
 	rm -f makefile.dep makefile.autocoq
 
 doc/%.html: %.md

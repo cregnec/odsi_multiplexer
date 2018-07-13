@@ -261,12 +261,13 @@ void freePage(uint32_t *page)
  * \param mmap_ptr Pointer to a multiboot-compliant memory map
  * \param len Length of the memory map structure
  */
-void dumpMmap(uint32_t *mmap_ptr, uint32_t len)
+uint32_t dumpMmap(uint32_t *mmap_ptr, uint32_t len)
 {
     // Gets size of structure
     multiboot_memory_map_t* mmap = (multiboot_memory_map_t*)mmap_ptr;
     uint32_t num = 1;
 
+    multiboot_memory_map_t* ram = NULL;
     extern uint32_t code;
 
     // Parse each entry
@@ -279,6 +280,7 @@ void dumpMmap(uint32_t *mmap_ptr, uint32_t len)
             break;
         case MULTIBOOT_MEMORY_AVAILABLE:
             DEBUG(CRITICAL, "\tAVAILABLE");
+            ram = mmap;
             initFreePageList(mmap->base_addr_low, mmap->length_low);
             break;
         case MULTIBOOT_MEMORY_BADRAM:
@@ -303,6 +305,7 @@ void dumpMmap(uint32_t *mmap_ptr, uint32_t len)
     }
 
     DEBUG(CRITICAL,"Amount of page available : %d",maxPages/PAGE_SIZE);
+    return ram->base_addr_low + ram->length_low;
 }
 
 /* Marks the whole kernel area as global, preventing TLB invalidations */
@@ -331,7 +334,7 @@ void mark_kernel_global()
  * \fn void initMmu()
  * \brief Initializes the MMU, creating the kernel's page directory and switching to it.
  */
-void initMmu()
+void initMmu(uint32_t ram_end)
 {
 
     /* Create the Kernel Page Directory */
@@ -473,7 +476,7 @@ void initMmu()
 
 	/* We should be done with page allocation and stuff : the remaining pages should be available as memory for the partition */
 	/* First prepare all pages : pages required for prepare should be deleted from free page list */
-	while((pg = (uint32_t)allocPage()) && curAddr < 0xFFFFC000) {
+	while((pg = (uint32_t)allocPage()) && curAddr < ram_end) {
 		mapPageC((uintptr_t)kernelDirectory, pg, curAddr, 1);
 		curAddr += 0x1000;
 	}

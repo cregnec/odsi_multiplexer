@@ -81,24 +81,24 @@ isKernel (uint32_t cs)
 
 void dumpRegs(int_ctx_t* is, uint32_t outputLevel)
 {
-	DEBUG(outputLevel, "Register dump: eax=%x, ebx=%x, ecx=%x, edx=%x\r\n",
+	DEBUG(TRACE, "Register dump: eax=%x, ebx=%x, ecx=%x, edx=%x\r\n",
 		  GENERAL_REG(is, eax),
 		  GENERAL_REG(is, ebx),
 		  GENERAL_REG(is, ecx),
 		  GENERAL_REG(is, edx));
-	DEBUG(outputLevel, "               edi=%x, esi=%x, ebp=%x, esp=%x\r\n",
+	DEBUG(TRACE, "               edi=%x, esi=%x, ebp=%x, esp=%x\r\n",
 		  GENERAL_REG(is, edi),
 		  GENERAL_REG(is, esi),
 		  GENERAL_REG(is, ebp),
 		  OPTIONAL_REG(is, useresp));
 	if(isKernel(OPTIONAL_REG(is, cs)))
 	{
-		DEBUG(outputLevel, "               cs=%x, eip=%x, int=%x\r\n",
+		DEBUG(TRACE, "               cs=%x, eip=%x, int=%x\r\n",
 			  OPTIONAL_REG(is, cs),
 			  OPTIONAL_REG(is, eip),
 			  OPTIONAL_REG(is, int_no));
 	} else {
-		DEBUG(outputLevel, "               cs=%x, ss=%x, eip=%x, int=%x\r\n",
+		DEBUG(TRACE, "               cs=%x, ss=%x, eip=%x, int=%x\r\n",
 			  OPTIONAL_REG(is, cs),
 			  OPTIONAL_REG(is, ss),
 			  OPTIONAL_REG(is, eip),
@@ -377,7 +377,6 @@ genericHandler (int_ctx_t *is)
 			return;
 		}
 
-		//IAL_DEBUG(TRACE, "Current partition is %x, root partition is %x.\r\n", PARTITION_CURRENT, PARTITION_ROOT);
 
 		/* Special case : root partition might be running - TODO : remove this when it gets stable */
 		/*if(PARTITION_CURRENT == PARTITION_ROOT)
@@ -389,15 +388,16 @@ genericHandler (int_ctx_t *is)
 		/* Special case : root partition might be VCLI'd - check this */
 		uintptr_t rootVidt = readVidt(PARTITION_ROOT);
 
-		//IAL_DEBUG(TRACE, "Root VIDT at %x.\r\n", rootVidt);
+		// IAL_DEBUG(TRACE, "Root VIDT at %x.\r\n", rootVidt);
 		uint32_t flags = readPhysical(rootVidt, getTableSize()-1); /* *(uint32_t*)(rootVidt + 0x1000 - sizeof(uint32_t)); */
-		//IAL_DEBUG(TRACE, "Root VIDT flags are set to %x.\r\n", flags);
+		// IAL_DEBUG(TRACE, "Root VIDT flags are set to %x.\r\n", flags);
 		if(flags & 0x1)
 		{
-			//IAL_DEBUG(TRACE, "Ignoring hardware interrupt while root partition is busy.\r\n");
+			// IAL_DEBUG(TRACE, "Ignoring hardware interrupt while root partition is busy.\r\n");
 			return;
 		}
 
+		IAL_DEBUG(TRACE, "Current partition is %x, root partition is %x.\r\n", PARTITION_CURRENT, PARTITION_ROOT);
 		/* Set target as root partition */
 		target = PARTITION_ROOT;
 		from = PARTITION_CURRENT;

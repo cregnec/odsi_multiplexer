@@ -45,9 +45,13 @@ yes | cp pipcore-mp/src/partitions/x86/NetworkMngr/pip-freertos.bin pipcore-mp/s
 #make -C pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/ clean all
 make -B -C pipcore-mp/src/partitions/x86/pip-freertos/ all
 
+yes | cp pipcore-mp/src/partitions/x86/pip-freertos/pip-freertos.bin pipcore-mp/src/partitions/x86/multiplexer
+
+make -B -C pipcore-mp/src/partitions/x86/multiplexer
+
 if [ "$1" == "galileo" ]
 then
-    make -C pipcore-mp TARGET=galileo PARTITION=pip-freertos clean partition kernel
+    make -C pipcore-mp TARGET=galileo PARTITION=multiplexer clean partition kernel
 else
-    make -C pipcore-mp TARGET=x86_multiboot PARTITION=pip-freertos clean partition kernel
+    make -C pipcore-mp TARGET=x86_multiboot PARTITION=multiplexer clean partition kernel
 fi
