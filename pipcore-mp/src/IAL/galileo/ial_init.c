@@ -532,7 +532,7 @@ initInterrupts (void)
 	bindIsr ();
 	remapIrq ();
 	bindIrq ();
-	timerPhase (400);
+	timerPhase (10);
 	timer_ticks = 0;
 	initCpu();
 }

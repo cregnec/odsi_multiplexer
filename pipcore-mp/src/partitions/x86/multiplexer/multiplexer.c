@@ -14,7 +14,7 @@
 #define UART_PCI_BSE 0xE00A5000
 
 #define ADDR_TO_MAP 0xA000000
-#define MAX_PAGE 1000
+#define MAX_PAGE 0x5000
 
 extern void* _partition_freertos, _epartition_freertos;
 uint32_t partitionCaller;

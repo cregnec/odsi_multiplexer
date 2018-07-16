@@ -698,18 +698,23 @@ static int startPartition= 0;
 void enableSerialInChild(){
 
 		//printf("Mapping UART { 0x%x , 0x%x } in child 0x%x\r\n",UART_MMIO_Base,UART_PCI_Base,pxCurrentTCB->pxTopOfStack);
+	#ifdef GALILEO
+
 		mapPageWrapper((uint32_t)EC_BASE,(uint32_t)pxCurrentTCB->pxTopOfStack,EC_BASE);
 		mapPageWrapper((uint32_t)UART_MMIO_BSE,(uint32_t)pxCurrentTCB->pxTopOfStack,UART_MMIO_BSE);
 		mapPageWrapper((uint32_t)UART_PCI_BSE,(uint32_t)pxCurrentTCB->pxTopOfStack,UART_PCI_BSE);
+	#endif
 }
 
 void disableSerialInChild(){
 	if(!startPartition)
 		return ;
+	#ifdef GALILEO
 
 	Pip_RemoveVAddr((uint32_t)pxCurrentTCB->pxTopOfStack,EC_BASE);
 	Pip_RemoveVAddr((uint32_t)pxCurrentTCB->pxTopOfStack,UART_MMIO_BSE);
 	Pip_RemoveVAddr((uint32_t)pxCurrentTCB->pxTopOfStack,UART_PCI_BSE);
+	#endif
 	//printf("Getting back serial %x %x from %x\r\n",UART_MMIO_Base,UART_PCI_Base,pxCurrentTCB->pxTopOfStack);
 }
 uint32_t xTaskSwitchToProtectedTask(){

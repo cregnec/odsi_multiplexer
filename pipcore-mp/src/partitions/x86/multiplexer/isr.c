@@ -8,7 +8,7 @@
 #include <pip/fpinfo.h>
 
 INTERRUPT_HANDLER(timerRoutineAsm,timerRoutine)
-printf("timerRoutine\r\n");
+// printf("timerRoutine\r\n");
 // switch (data1) {
 // case queueCreate:
 //       queueCreateService(data2);
@@ -32,7 +32,7 @@ printf("timerRoutine\r\n");
 END_OF_INTERRUPT
 
 INTERRUPT_HANDLER(spuriousIrqRoutineAsm,spuriousIrqRoutine)
-printf("spuriousIrqRoutine, caller is 0x%x\r\n", caller);
+// printf("spuriousIrqRoutine, caller is 0x%x\r\n", caller);
 END_OF_INTERRUPT
 
 void init_isr()

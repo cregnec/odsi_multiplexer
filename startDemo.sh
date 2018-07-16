@@ -45,7 +45,7 @@ yes | cp pipcore-mp/src/partitions/x86/NetworkMngr/pip-freertos.bin pipcore-mp/s
 #make -C pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/ clean all
 make -B -C pipcore-mp/src/partitions/x86/pip-freertos/ all
 
-yes | cp pipcore-mp/src/partitions/x86/pip-freertos/pip-freertos.bin pipcore-mp/src/partitions/x86/multiplexer
+yes | cp pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/Build/FreeRTOS.bin pipcore-mp/src/partitions/x86/multiplexer/pip-freertos.bin
 
 make -B -C pipcore-mp/src/partitions/x86/multiplexer
 

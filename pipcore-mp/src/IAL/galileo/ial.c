@@ -400,7 +400,7 @@ genericHandler (int_ctx_t *is)
 		IAL_DEBUG(TRACE, "Current partition is %x, root partition is %x.\r\n", PARTITION_CURRENT, PARTITION_ROOT);
 		/* Set target as root partition */
 		target = PARTITION_ROOT;
-		from = PARTITION_CURRENT;
+		from = readPhysicalNoFlags(PARTITION_CURRENT, indexPR());
 
 	} else {
 		IAL_DEBUG(CRITICAL, "Got fault interrupt %d.\r\n", is->int_no);
