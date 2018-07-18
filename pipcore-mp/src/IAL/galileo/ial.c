@@ -600,7 +600,7 @@ void resume (uint32_t descriptor, uint32_t pipflags)
 	}
 	/* A parent notifies a child */
 	else {
-		if (!checkChild(PARTITION_CURRENT, getNbLevel(), descriptor))
+		if ((PARTITION_CURRENT == PARTITION_ROOT) || (!checkChild(PARTITION_CURRENT, getNbLevel(), descriptor)))
 		{
 			IAL_DEBUG(WARNING, "Partition %x tried to access invalid child %x\r\n", getCurPartition(), descriptor);
 			return;
