@@ -364,12 +364,18 @@ genericHandler (int_ctx_t *is)
 	/* A bit of the handling is different with hardware interrupts */
 	if(INT_IRQ(is->int_no))
 	{
-		//IAL_DEBUG(TRACE, "Got hardware interrupt %d.\r\n", is->int_no);
+		uint32_t irq_no = is->int_no - 0x20;
+
+		if (irq_no == 0x7){
+			char int_no = pic_get_isr()&0xffff;
+			if (!int_no){
+				return;
+			}
+		}
 		/* Acknowledge hardware interrupt */
-		if (is->int_no >= 40)
+		if (irq_no >= 0x8)
 			outb (PIC2_COMMAND, PIC_EOI);
 		outb (PIC1_COMMAND, PIC_EOI);
-
 		/* Ignore kernel-land IRQ */
 		if (isKernel(is->cs))
 		{
@@ -397,10 +403,21 @@ genericHandler (int_ctx_t *is)
 			return;
 		}
 
+
 		IAL_DEBUG(TRACE, "Current partition is %x, root partition is %x.\r\n", PARTITION_CURRENT, PARTITION_ROOT);
 		/* Set target as root partition */
 		target = PARTITION_ROOT;
 		from = readPhysicalNoFlags(PARTITION_CURRENT, indexPR());
+		if (!checkChild(PARTITION_ROOT, getNbLevel(), from)) {
+			data1 = 1;
+			IAL_DEBUG(TRACE, "partition 0x%x is not a child of root partition, set data1 to %d.\n", from, data1);
+
+		} else{
+			data1 = 0;
+			IAL_DEBUG(TRACE, "partition 0x%x is a child of root partition, set data1 to %d.\n", from, data1);
+		}
+
+		//IAL_DEBUG(TRACE, "Got hardware interrupt %d.\r\n", is->int_no);
 
 	} else {
 		IAL_DEBUG(CRITICAL, "Got fault interrupt %d.\r\n", is->int_no);
@@ -600,7 +617,7 @@ void resume (uint32_t descriptor, uint32_t pipflags)
 	}
 	/* A parent notifies a child */
 	else {
-		if ((PARTITION_CURRENT == PARTITION_ROOT) || (!checkChild(PARTITION_CURRENT, getNbLevel(), descriptor)))
+		if (!checkChild(PARTITION_CURRENT, getNbLevel(), descriptor))
 		{
 			IAL_DEBUG(WARNING, "Partition %x tried to access invalid child %x\r\n", getCurPartition(), descriptor);
 			return;
