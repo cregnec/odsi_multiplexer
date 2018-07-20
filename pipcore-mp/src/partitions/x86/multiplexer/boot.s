@@ -7,17 +7,15 @@
 .extern main
 .extern Pip_VCLI
 _start:
-    push %ebx
+    push %ebx #data2
+    push %eax #data1
     call Pip_VCLI
     call main
     call loop
 
-loop:
-    jmp loop
 
 
 .globl timerRoutineAsm
-.extern vcli
 .align 4
 timerRoutineAsm :
     push %ecx #caller
@@ -25,13 +23,16 @@ timerRoutineAsm :
     push %eax #data1
     .extern timerRoutine
     call timerRoutine
+    call loop
 
-.globl spuriousIrqRoutineAsm
-.extern vcli
-.align 4
-spuriousIrqRoutineAsm :
-    push %ecx
-    push %ebx
-    push %eax
-    .extern spuriousIrqRoutine
-    call spuriousIrqRoutine
+loop:
+    jmp loop
+
+# .globl spuriousIrqRoutineAsm
+# .align 4
+# spuriousIrqRoutineAsm :
+#     push %ecx
+#     push %ebx
+#     push %eax
+#     .extern spuriousIrqRoutine
+#     call spuriousIrqRoutine

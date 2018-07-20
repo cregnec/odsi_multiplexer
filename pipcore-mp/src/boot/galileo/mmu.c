@@ -53,7 +53,7 @@ uint32_t maxPages = 0; //!< The maximal amount of pages available
 uint32_t allocatedPages = 0; //!< The current allocated amount of pages
 uint32_t ramEnd = 0; //!< End of memory
 uint32_t pageCount = 0;
-
+uint32_t phy_dma_page, v_dma_page;
 // Defined in libc.c
 extern uint32_t placement_address; //!< Placement address, this should be unused.
 uint32_t test = 0;
@@ -200,7 +200,7 @@ void initFreePageList(uintptr_t base, uintptr_t length)
 		uint32_t i;
 
 		/* Add each page of free area */
-		for(i = base ; i < length - 0x1000; i+=0x1000)
+		for(i = base ; i < base + length - 0x1000; i+=0x1000)
 		{
 
 			/* Ignore kernel area */
@@ -222,6 +222,7 @@ void initFreePageList(uintptr_t base, uintptr_t length)
 		DEBUG(CRITICAL, "Added memory region to page allocator, first page %x, last page at %x, %d pages", firstFreePage, base,length/PAGE_SIZE);
 		maxPages += length;
 		ramEnd = i;
+        DEBUG(CRITICAL, "Ram ends at %x\r\n and the last page if reserved for DMA", ramEnd);
 	} else {
 		DEBUG(CRITICAL, "Not adding low-memory area");
 	}
@@ -261,7 +262,7 @@ void freePage(uint32_t *page)
  * \param mmap_ptr Pointer to a multiboot-compliant memory map
  * \param len Length of the memory map structure
  */
-uint32_t dumpMmap(uint32_t *mmap_ptr, uint32_t len)
+void dumpMmap(uint32_t *mmap_ptr, uint32_t len)
 {
     // Gets size of structure
     multiboot_memory_map_t* mmap = (multiboot_memory_map_t*)mmap_ptr;
@@ -280,7 +281,6 @@ uint32_t dumpMmap(uint32_t *mmap_ptr, uint32_t len)
             break;
         case MULTIBOOT_MEMORY_AVAILABLE:
             DEBUG(CRITICAL, "\tAVAILABLE");
-            ram = mmap;
             initFreePageList(mmap->base_addr_low, mmap->length_low);
             break;
         case MULTIBOOT_MEMORY_BADRAM:
@@ -305,7 +305,6 @@ uint32_t dumpMmap(uint32_t *mmap_ptr, uint32_t len)
     }
 
     DEBUG(CRITICAL,"Amount of page available : %d",maxPages/PAGE_SIZE);
-    return ram->base_addr_low + ram->length_low;
 }
 
 /* Marks the whole kernel area as global, preventing TLB invalidations */
@@ -334,7 +333,7 @@ void mark_kernel_global()
  * \fn void initMmu()
  * \brief Initializes the MMU, creating the kernel's page directory and switching to it.
  */
-void initMmu(uint32_t ram_end)
+void initMmu()
 {
 
     /* Create the Kernel Page Directory */
@@ -476,7 +475,7 @@ void initMmu(uint32_t ram_end)
 
 	/* We should be done with page allocation and stuff : the remaining pages should be available as memory for the partition */
 	/* First prepare all pages : pages required for prepare should be deleted from free page list */
-	while((pg = (uint32_t)allocPage()) && curAddr < ram_end) {
+	while((pg = (uint32_t)allocPage()) && curAddr < ramEnd) {
 		mapPageC((uintptr_t)kernelDirectory, pg, curAddr, 1);
 		curAddr += 0x1000;
 	}
@@ -497,7 +496,7 @@ void initMmu(uint32_t ram_end)
 		/* Map UART */
 
 
-		DEBUG(WARNING,"Mapping MMIO into root partition\r\n");
+	DEBUG(WARNING,"Mapping MMIO into root partition\r\n");
 
 
 	int index;
@@ -506,6 +505,9 @@ void initMmu(uint32_t ram_end)
 			mapPageWrapper(kernelDirectory,(uint32_t)(0x90000000+index),(uint32_t)(0x90000000+index),1);
 	}
 
+    phy_dma_page = ramEnd;
+    v_dma_page = 0xFFFEC000;
+    mapPageWrapper(kernelDirectory, phy_dma_page, v_dma_page, 1);
 
 	activate((uint32_t)kernelDirectory);
 }

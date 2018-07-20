@@ -79,6 +79,7 @@ pip_fpinfo* fpinfo;
  *
  * Spawns the multiplexer given into the first partition space.
  */
+extern uint32_t phy_dma_page, v_dma_page;
 void spawnFirstPartition()
 {
 	uint32_t multiplexer_cr3 = readPhysicalNoFlags(getRootPartition(), indexPD()+1);
@@ -108,7 +109,7 @@ void spawnFirstPartition()
 	DEBUG(TRACE, "Root VIDT at %x has set flags at %x to 0x1.\r\r\n", virq, virq + 0xFFC);
 
 	// Send virtual IRQ 0 to partition
-	dispatch2(getRootPartition(), 0, 0x1e75b007, (uint32_t)0xFFFFC000, 0);
+	dispatch2(getRootPartition(), 0, phy_dma_page, v_dma_page, 0);
 }
 
 /**
@@ -168,11 +169,11 @@ int c_main(struct multiboot *mbootPtr)
 
 	// Initialize free page list
 	DEBUG(INFO, "-> Initializing paging.\r\n");
-	uint32_t ram_end = dumpMmap((uint32_t*)mbootPtr->mmap_addr, mbootPtr->mmap_length);
+	dumpMmap((uint32_t*)mbootPtr->mmap_addr, mbootPtr->mmap_length);
 
 	// Install and test MMU
 	DEBUG(INFO, "-> Initializing MMU.\r\n");
-	initMmu(ram_end);
+	initMmu();
 
 	DEBUG(INFO, "-> Now spawning multiplexer in userland.\r\n");
 	spawnFirstPartition();
