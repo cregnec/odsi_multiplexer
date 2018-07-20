@@ -57,5 +57,11 @@
 #define ICW4_BUF_MASTER	0x0C	/* Buffered mode/master */
 #define ICW4_SFNM	0x10	/* Special fully nested (not) */
 #define PIC_EOI		0x20
+#define PIC_READ_IRR                0x0a    /* OCW3 irq ready next CMD read */
+#define PIC_READ_ISR                0x0b    /* OCW3 irq service next CMD read */
 
+#define uint16_t unsigned short
+
+uint16_t pic_get_irr(void);
+uint16_t pic_get_isr(void);
 #endif
