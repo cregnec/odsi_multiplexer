@@ -70,5 +70,20 @@ SECTIONS
       _epartition_freertos = . ;
   }
 
+    .partition_secure : ALIGN(4096)
+  {
+      _partition_secure = . ;
+      *(.secure)
+      . = ALIGN(0x40000);
+      _epartition_secure = . ;
+  }
+
+    .partition_normal : ALIGN(4096)
+  {
+      _partition_normal = . ;
+      *(.normal)
+      . = ALIGN(0x40000);
+      _epartition_normal = . ;
+  }
 }
 

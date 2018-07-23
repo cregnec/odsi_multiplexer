@@ -1,4 +1,5 @@
 #include "pic8259.h"
+#include "port.h"
 
 /* Helper func */
 static uint16_t __pic_get_irq_reg(int ocw3)

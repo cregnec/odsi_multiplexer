@@ -33,6 +33,10 @@ echo "sp3" && sleep 1
 make -C pipcore-mp/src/partitions/x86/sp3Task/ all
 echo "Network manager" && sleep 1
 make -C pipcore-mp/src/partitions/x86/NetworkMngr/ all
+echo "Secure partition" && sleep 1
+make -C pipcore-mp/src/partitions/x86/secure/ all
+echo "Normal partition" && sleep 1
+make -C pipcore-mp/src/partitions/x86/normal/ all
 echo "Compilation des sous partition terminée" && sleep 1
 
 yes | cp pipcore-mp/src/partitions/x86/owner/pip-freertos.bin pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/Support_Files/partitions_images/part1.bin
@@ -46,6 +50,8 @@ yes | cp pipcore-mp/src/partitions/x86/NetworkMngr/pip-freertos.bin pipcore-mp/s
 make -B -C pipcore-mp/src/partitions/x86/pip-freertos/ all
 
 yes | cp pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/Build/FreeRTOS.bin pipcore-mp/src/partitions/x86/multiplexer/pip-freertos.bin
+yes | cp pipcore-mp/src/partitions/x86/secure/secure.bin pipcore-mp/src/partitions/x86/multiplexer/secure.bin
+yes | cp pipcore-mp/src/partitions/x86/normal/normal.bin pipcore-mp/src/partitions/x86/multiplexer/normal.bin
 
 make -B -C pipcore-mp/src/partitions/x86/multiplexer
 

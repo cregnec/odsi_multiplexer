@@ -22,6 +22,9 @@ make -C pipcore-mp/src/partitions/x86/sp1Task/ clean
 make -C pipcore-mp/src/partitions/x86/sp2Task/ clean
 make -C pipcore-mp/src/partitions/x86/sp3Task/ clean
 make -C pipcore-mp/src/partitions/x86/NetworkMngr/ clean
+make -C pipcore-mp/src/partitions/x86/secure/ clean
+make -C pipcore-mp/src/partitions/x86/normal/ clean
+make -C pipcore-mp/src/partitions/x86/multiplexer/ clean
 
 
 
