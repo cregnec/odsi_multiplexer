@@ -421,15 +421,6 @@ genericHandler (int_ctx_t *is)
 		/* Set target as root partition */
 		target = PARTITION_ROOT;
 		from = readPhysicalNoFlags(PARTITION_CURRENT, indexPR());
-		if (!checkChild(PARTITION_ROOT, getNbLevel(), from)) {
-			data1 = 1;
-			IAL_DEBUG(TRACE, "partition 0x%x is not a child of root partition, set data1 to %d.\n", from, data1);
-
-		} else{
-			data1 = 0;
-			IAL_DEBUG(TRACE, "partition 0x%x is a child of root partition, set data1 to %d.\n", from, data1);
-		}
-
 	} else {
 		IAL_DEBUG(TRACE, "Got fault interrupt %d.\n", is->int_no);
 

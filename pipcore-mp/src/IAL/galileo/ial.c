@@ -364,6 +364,7 @@ genericHandler (int_ctx_t *is)
 	/* A bit of the handling is different with hardware interrupts */
 	if(INT_IRQ(is->int_no))
 	{
+		IAL_DEBUG(TRACE, "Got hardware interrupt %d.\r\n", is->int_no);
 		uint32_t irq_no = is->int_no - 0x20;
 
 		if (irq_no == 0x7){
@@ -399,7 +400,7 @@ genericHandler (int_ctx_t *is)
 		// IAL_DEBUG(TRACE, "Root VIDT flags are set to %x.\r\n", flags);
 		if(flags & 0x1)
 		{
-			// IAL_DEBUG(TRACE, "Ignoring hardware interrupt while root partition is busy.\r\n");
+			IAL_DEBUG(TRACE, "Ignoring hardware interrupt while root partition is busy.\r\n");
 			return;
 		}
 
@@ -408,17 +409,6 @@ genericHandler (int_ctx_t *is)
 		/* Set target as root partition */
 		target = PARTITION_ROOT;
 		from = readPhysicalNoFlags(PARTITION_CURRENT, indexPR());
-		if (!checkChild(PARTITION_ROOT, getNbLevel(), from)) {
-			data1 = 1;
-			IAL_DEBUG(TRACE, "partition 0x%x is not a child of root partition, set data1 to %d.\n", from, data1);
-
-		} else{
-			data1 = 0;
-			IAL_DEBUG(TRACE, "partition 0x%x is a child of root partition, set data1 to %d.\n", from, data1);
-		}
-
-		//IAL_DEBUG(TRACE, "Got hardware interrupt %d.\r\n", is->int_no);
-
 	} else {
 		IAL_DEBUG(CRITICAL, "Got fault interrupt %d.\r\n", is->int_no);
 
