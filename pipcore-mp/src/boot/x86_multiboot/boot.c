@@ -72,6 +72,7 @@
  */
 extern uint32_t __multiplexer;
 #define MULTIPLEXER_LOAD_ADDR (uint32_t)&__multiplexer
+extern uint32_t phy_dma_page, v_dma_page;
 
 pip_fpinfo* fpinfo;
 
@@ -80,7 +81,7 @@ pip_fpinfo* fpinfo;
  * \brief Spawns the multiplexer.
  *
  * Spawns the multiplexer given into the first partition space.
- */ 
+ */
 void spawnFirstPartition()
 {
 	uint32_t multiplexer_cr3 = readPhysicalNoFlags(getRootPartition(), indexPD()+1);
@@ -96,20 +97,20 @@ void spawnFirstPartition()
 	// Find virtual interrupt vector for partition
 	uintptr_t ptVirq = readPhysicalNoFlags((uintptr_t)multiplexer_cr3, getTableSize() - 1);
 	uintptr_t virq = readPhysicalNoFlags(ptVirq, getTableSize() - 1);
-	
+
 	// Set user stack into virq
 	uint32_t target = (uint32_t)(virq) + sizeof(uint32_t);
 	writePhysical(target, 0x1, (uint32_t)usrStack);
-	
+
 	DEBUG(TRACE, "user stack is %x\n", usrStack);
-	
+
 	/* Set VCLI flag ! */
 	writePhysicalNoFlags(virq, getTableSize()-1, 0x1);
 	IAL_DEBUG(TRACE, "Root VIDT at %x has set flags at %x to 0x1.\n", virq, virq + 0xFFC);
-	
+
 	// Send virtual IRQ 0 to partition
 
-	dispatch2(getRootPartition(), 0, 0x1e75b007, (uint32_t)0xFFFFC000, 0);
+	dispatch2(getRootPartition(), 0, phy_dma_page, v_dma_page, 0);
 }
 
 /**
@@ -122,10 +123,10 @@ uintptr_t fillFpInfo()
 	extern uint32_t ramEnd;
 
 	DEBUG(TRACE, "FPInfo now at %x\n", fpinfo);
-	
+
 	// Fill first partition info structure
 
-	
+
 	return (uintptr_t)fpinfo;
 }
 
@@ -147,13 +148,13 @@ int c_main(struct multiboot *mbootPtr)
 {
 	initSerial();
 	DEBUG(INFO, "Pip kernel, git revision %s\n", GIT_REVISION);
-	
+
 	// Install GDT & IDT
 	DEBUG(INFO, "-> Initializing ISR.\n");
 	initInterrupts();
 	DEBUG(INFO, "-> Initializing GDT.\n");
 	gdtInstall();
-	
+
 	// Initialize free page list
 	DEBUG(INFO, "-> Initializing paging.\n");
 	dumpMmap((uint32_t*)mbootPtr->mmap_addr, mbootPtr->mmap_length);
@@ -161,11 +162,11 @@ int c_main(struct multiboot *mbootPtr)
 	// Install and test MMU
 	DEBUG(INFO, "-> Initializing MMU.\n");
 	initMmu();
-	
+
 	DEBUG(INFO, "-> Now spawning multiplexer in userland.\n");
 	spawnFirstPartition();
 
 	DEBUG(CRITICAL, "-> Unexpected multiplexer return freezing\n");
 	for(;;);
 	return 0xCAFECAFE;
-} 
+}
