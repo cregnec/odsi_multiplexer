@@ -13,26 +13,26 @@ _start:
     call main
     call loop
 
-
-
-.globl timerRoutineAsm
-.align 4
-timerRoutineAsm :
-    push %ecx #caller
-    push %ebx #data2
-    push %eax #data1
-    .extern timerRoutine
-    call timerRoutine
-    call loop
-
 loop:
     jmp loop
 
-# .globl spuriousIrqRoutineAsm
-# .align 4
-# spuriousIrqRoutineAsm :
-#     push %ecx
-#     push %ebx
-#     push %eax
-#     .extern spuriousIrqRoutine
-#     call spuriousIrqRoutine
+
+.globl timerRoutineAsm;
+.align 4
+timerRoutineAsm:
+    push %ecx
+    push %ebx
+    push %eax
+    .extern timerRoutine
+    call timerRoutine
+
+
+
+.globl virtualSerialRoutineAsm;
+.align 4
+virtualSerialRoutineAsm:
+    push %ecx
+    push %ebx
+    push %eax
+    .extern virtualSerialRoutine
+    call virtualSerialRoutine

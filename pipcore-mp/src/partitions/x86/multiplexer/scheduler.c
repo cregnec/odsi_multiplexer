@@ -16,7 +16,7 @@ bool initialize_vcpu(uint32_t partition_entry)
     }
 
     vcpus[nb_vcpus].partition_entry = partition_entry;
-    vcpus[nb_vcpus].suspended_caller = NULL;
+    vcpus[nb_vcpus].suspended_caller = 0;
     vcpus[nb_vcpus].started = false;
 
     nb_vcpus ++;
@@ -27,12 +27,13 @@ void switch_to_vcpu(VCPU* vcpu)
 {
     if (!vcpu->started){
         vcpu->started = true;
-        printf("Starting partition: 0x%x\r\n", vcpu->partition_entry);
+        // printf("Starting partition: 0x%x\r\n", vcpu->partition_entry);
         Pip_Notify(vcpu->partition_entry, 0, 0, 0);
     } else {
         if (vcpu->suspended_caller){
             uint32_t suspended_caller = vcpu->suspended_caller;
-            vcpu->suspended_caller = NULL;
+            vcpu->suspended_caller = 0;
+            // printf("Asking a parent partition to resume a child partition\r\n");
             Pip_Notify(vcpu->partition_entry, 0x81, suspended_caller, 0);
         } else {
             Pip_Resume(vcpu->partition_entry, 0);
@@ -49,6 +50,7 @@ void save_vcpu_caller(uint32_t caller)
 {
     /* if a sub partition is suspended */
     if (current_vcpu->partition_entry != caller){
+        // printf("Save suspended child partition\r\n");
         if (current_vcpu->suspended_caller){
             printf("Error: a suspended paritition was not resumed\r\n");
         }
@@ -66,11 +68,9 @@ void schedule(uint32_t caller)
     if (current_vcpu == NULL){
         current_vcpu = &vcpus[0];
     } else {
-        disable_serial(current_vcpu);
         save_vcpu_caller(caller);
         next_vcpu_id = (vcpu_index(current_vcpu) + 1) % nb_vcpus;
         current_vcpu = &vcpus[next_vcpu_id];
     }
-    enable_serial(current_vcpu);
     switch_to_vcpu(current_vcpu);
 }
