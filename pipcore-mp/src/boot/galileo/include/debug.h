@@ -59,6 +59,7 @@ int printf(const char *format, ...);
  * \brief Strings for debugging output.
  */
 
+#ifdef PIPDEBUG
 
 #define PIP_DEBUG_MODE 1
 
@@ -131,6 +132,24 @@ do { \
     } \
 } while (0);
 
+#else
+/**
+ * \brief Defines the appropriate DEBUG behavior.
+ */
+#define DEBUG(...)
+#define DEBUGRAW(...)
+/**
+ * \brief Defines the appropriate DEBUGHEX behavior.
+ */
+#define DEBUGHEX(...)
+/**
+ * \brief Defines the appropriate DEBUGDEC behavior.
+ */
+#define DEBUGDEC(...)
+
+#define dumpRegs(...)
+
+#endif
 
 #define BENCH_BEGIN counter_update(1)
 #define BENCH_END {counter_update(0); DEBUG(TRACE, "Benchmark lasted "); display_time();}

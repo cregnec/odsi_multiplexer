@@ -85,26 +85,11 @@ enum {
  * \brief Defines the appropriate DEBUGDEC behavior.
  */
 #define DEBUGDEC(a) putdec(a)
-#else
 /**
- * \brief Defines the appropriate DEBUG behavior.
- */
-#define DEBUG(...)
-#define DEBUGRAW(...)
-/**
- * \brief Defines the appropriate DEBUGHEX behavior.
- */
-#define DEBUGHEX(...)
-/**
- * \brief Defines the appropriate DEBUGDEC behavior.
- */
-#define DEBUGDEC(...)
-
-/**
- * \fn isKernel(uint32_t cs)
- * \brief Determines if we're in kernel mode or not.
- * \param cs Code segment
- * \return 1 if we're in kernel mode, 0 else
+ * \fn dumpRegs(int_ctx_t* is, uint32_t outputLevel)
+ * \brief Dumps the registers of a saved interrupt context onto the serial output.
+ * \param is Interrupted state
+ * \param outputLevel Serial log debugging output level
  */
 #define dumpRegs(is, outputLevel) \
 do { \
@@ -132,6 +117,23 @@ do { \
               OPTIONAL_REG(is, int_no)); \
     } \
 } while (0);
+
+#else
+/**
+ * \brief Defines the appropriate DEBUG behavior.
+ */
+#define DEBUG(...)
+#define DEBUGRAW(...)
+/**
+ * \brief Defines the appropriate DEBUGHEX behavior.
+ */
+#define DEBUGHEX(...)
+/**
+ * \brief Defines the appropriate DEBUGDEC behavior.
+ */
+#define DEBUGDEC(...)
+
+#define dumpRegs(...)
 
 #endif
 

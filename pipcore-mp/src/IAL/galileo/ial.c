@@ -67,6 +67,12 @@ extern uint32_t readCR2(void); //!< Reads CR2 register (faulting address)
 
 extern int checkChild(const uintptr_t partition, const uint32_t l1, const uintptr_t va);
 
+/**
+ * \fn isKernel(uint32_t cs)
+ * \brief Determines if we're in kernel mode or not.
+ * \param cs Code segment
+ * \return 1 if we're in kernel mode, 0 else
+ */
 int
 isKernel (uint32_t cs)
 {
