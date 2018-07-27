@@ -52,8 +52,9 @@ void init_isr()
 {
     int i = 0;
     if (irs_stack == NULL){
-        irs_stack = (uint32_t*) Pip_AllocPage() + 0x1000 -4 ;
-
+        irs_stack = (uint32_t*)Pip_AllocPage();
+        irs_stack = irs_stack + (0x1000/sizeof(uint32_t) - 1);
+        printf("Stack address is 0x%x\r\n", irs_stack);
     }
 
     for (i=1; i<33; i++){
