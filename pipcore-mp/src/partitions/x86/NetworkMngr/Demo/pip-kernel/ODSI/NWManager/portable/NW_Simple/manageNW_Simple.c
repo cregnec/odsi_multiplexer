@@ -16,7 +16,7 @@
 #include "CommonStructure.h"
 #include "MyAppConfig.h"
 #include "ResponseCode.h"
-#include "debug.h"
+#include "pip/debug.h"
 #include "string.h"
 #include "structcopy.h"
 #include "parser.h"

@@ -6,7 +6,7 @@
  */
 
 #include <Quark_x1000_gen_defs.h>
-#include "debug.h"
+#include "pip/debug.h"
 #include "stdio.h"
 
 #ifndef NULL

@@ -10,7 +10,7 @@
 #include "CommonStructure.h"
 #include "ManageDomain_Interface.h"
 #include "MyAppConfig.h"
-#include "debug.h"
+#include "pip/debug.h"
 #include "string.h"
 #include "structcopy.h"
 #include "stdint.h"

@@ -14,7 +14,7 @@
 #include "CommonStructure.h"
 #include "ResponseCode.h"
 #include "string.h"
-#include "debug.h"
+#include "pip/vidt.h"
 #include <stdlib.h>
 #include "stdint.h"
 #include "stddef.h"

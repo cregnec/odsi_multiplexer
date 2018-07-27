@@ -25,7 +25,7 @@
 
 #include <stdarg.h>
 #include <string.h>
-#include "debug.h"
+#include "pip/debug.h"
 
 //*****************************************************************************
 //

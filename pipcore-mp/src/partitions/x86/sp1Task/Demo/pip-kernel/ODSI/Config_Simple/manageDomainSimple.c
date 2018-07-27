@@ -7,7 +7,7 @@
 
 /*-----------------------------------------------------------*/
 
-#include "debug.h"
+#include "pip/debug.h"
 #include "string.h"
 #include "CommonStructure.h"
 #include "ResponseCode.h"

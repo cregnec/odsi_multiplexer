@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <pip/api.h>
 #include <pip/vidt.h>
+#include <pip/debug.h>
 
 uint32_t* irs_stack = NULL;
 extern uint32_t _phy_dma_page, _v_dma_page;

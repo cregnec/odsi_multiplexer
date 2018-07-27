@@ -13,10 +13,10 @@ else
 fi
 
 
-make -C libpip/ VARIANT=virtual clean all
+make -C libpip/ VARIANT=virtual clean all || exit
 
 
-make -C libfreertos clean all
+make -C libfreertos clean all || exit
 
 echo "Owner" && sleep 1
 make -C pipcore-mp/src/partitions/x86/owner/ all || exit
@@ -50,9 +50,9 @@ yes | cp pipcore-mp/src/partitions/x86/normal/normal.bin pipcore-mp/src/partitio
 
 if [ "$1" == "galileo" ]
 then
-    make -C libpip/ VARIANT=galileo clean all
+    make -C libpip/ VARIANT=galileo clean all || exit
 else
-    make -C libpip/ clean all
+    make -C libpip/ clean all || exit
 fi
 
 

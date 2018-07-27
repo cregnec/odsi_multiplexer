@@ -11,7 +11,7 @@
 #include "ManageKey_Interface.h"
 #include "MyAppConfig.h"
 #include "string.h"
-#include "debug.h"
+#include "pip/debug.h"
 #include "structcopy.h"
 #include "ResponseCode.h"
 #include "stdint.h"

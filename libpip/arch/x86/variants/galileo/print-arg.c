@@ -36,7 +36,6 @@
  * \brief Benchmarking and serial line output
  */
 
-#include "print-arg.h"
 #include "pip/api.h"
 #include "pip/debug.h"
 #include "pip/compat.h"

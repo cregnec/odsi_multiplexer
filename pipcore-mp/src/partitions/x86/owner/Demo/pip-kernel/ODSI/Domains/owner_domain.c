@@ -13,7 +13,7 @@
 #include "MyAppConfig.h"
 #include "validateToken_Interface.h"
 #include "ResponseCode.h"
-#include "debug.h"
+#include "pip/debug.h"
 #include "string.h"
 #include "structcopy.h"
 #include "parser.h"

@@ -8,7 +8,7 @@
 #include "Galileo_Gen2_Board.h"
 #include "Expander_Pcal9555_Driver.h"
 #include "GPIO_I2C.h"
-#include "debug.h"
+#include "pip/debug.h"
 #include "FreeRTOS.h"
 #include "task.h"
 

@@ -22,7 +22,7 @@
 #include "parser.h"
 #include "NWManager.h"
 #include "NWManager_Interface.h"
-#include "debug.h"
+#include "pip/debug.h"
 /* Kernel includes. */
 #include "FreeRTOS.h"
 #include "task.h"

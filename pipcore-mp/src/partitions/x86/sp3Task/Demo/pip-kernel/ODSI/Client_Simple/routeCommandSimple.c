@@ -13,7 +13,7 @@
 #include "CommonStructure.h"
 #include "routeCommandSimple.h"
 #include "ResponseCode.h"
-#include "debug.h"
+#include "pip/debug.h"
 #include "structcopy.h"
 #include "stdint.h"
 

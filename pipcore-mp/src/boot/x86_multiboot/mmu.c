@@ -339,14 +339,14 @@ void initMmu()
     }
 
 	/* Map root partition in userland */
-	curAddr = &__multiplexer;
+	curAddr = (uint32_t)&__multiplexer;
 	while(curAddr <= (uint32_t)(&end /* RAM_END */ /* 0xFFFFE000 */))
 	{
 		mapPageWrapper(kernelDirectory, curAddr, curAddr, 1);
 		curAddr += PAGE_SIZE;
 	}
 
-    mapPageWrapper(kernelDirectory, &__krnstack, &__krnstack, 0);
+    mapPageWrapper(kernelDirectory, (uint32_t)&__krnstack, (uint32_t)&__krnstack, 0);
 	/* Map each platform-specific device */
 	/* uint32_t vga = 0xB8000;
 	for(vga = 0xB8000; vga < 0xC0000; vga += 0x1000)

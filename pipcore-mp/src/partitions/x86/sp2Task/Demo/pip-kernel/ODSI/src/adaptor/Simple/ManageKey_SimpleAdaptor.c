@@ -15,7 +15,7 @@
 #include "ResponseCode.h"
 #include "MyAppConfig.h"
 #include "string.h"
-#include "debug.h"
+#include "pip/debug.h"
 
 /* Kernel includes. */
 

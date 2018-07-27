@@ -11,7 +11,7 @@
 #include "ResponseCode.h"
 #include "Galileo_Gen2_Board.h"
 #include "GPIO_I2C.h"
-#include "debug.h"
+#include "pip/debug.h"
 #include "structcopy.h"
 #include "string.h"
 #include "stdint.h"

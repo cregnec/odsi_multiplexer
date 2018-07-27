@@ -12,7 +12,7 @@
 #include "CommonStructure.h"
 #include "ManageDomain_Interface.h"
 #include "ResponseCode.h"
-#include "debug.h"
+#include "pip/debug.h"
 
 /* Kernel includes. */
 

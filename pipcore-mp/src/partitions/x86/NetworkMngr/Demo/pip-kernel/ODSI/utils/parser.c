@@ -7,7 +7,7 @@
 
 #include "CommonStructure.h"
 #include "string.h"
-#include "debug.h"
+#include "pip/debug.h"
 #include "structcopy.h"
 #include "stdint.h"
 #include "mystdlib.h"

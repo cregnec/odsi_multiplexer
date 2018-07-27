@@ -11,7 +11,7 @@
 #include "TokenValidator.h"
 #include "CommonStructure.h"
 #include "routeCommand_Interface.h"
-#include "debug.h"
+#include "pip/debug.h"
 #include "structcopy.h"
 #include "ResponseCode.h"
 

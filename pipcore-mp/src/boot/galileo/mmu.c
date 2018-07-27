@@ -356,13 +356,13 @@ void initMmu()
         curAddr += PAGE_SIZE;
     }
 
-    mapPageWrapper(kernelDirectory, &__krnstack, &__krnstack, 0);
+    mapPageWrapper(kernelDirectory, (uint32_t) &__krnstack, (uint32_t) &__krnstack, 0);
 	DEBUG(TRACE, "Kernel directory is at %x", kernelDirectory);
 
 
     DEBUG(TRACE,"Mapping the root partition in userland");
 	/* Map root partition in userland */
-	curAddr = &__multiplexer;
+	curAddr = (uint32_t)&__multiplexer;
 	while(curAddr <= (uint32_t)(&end /* RAM_END */ /* 0xFFFFE000 */))
 	{
 		mapPageWrapper(kernelDirectory, curAddr, curAddr, 1);
