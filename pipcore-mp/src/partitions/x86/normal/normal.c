@@ -33,9 +33,13 @@ void main()
     pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
     printf("Hello I'm from normal partition\r\n");
     parse_bootinfo(bootinfo);
-
+    int i = 0;
     for (;;){
-        printf("I'm looping\r\n");
+        if (i%1000000 == 0){
+            printf("I'm looping\r\n");
+            i = 1;
+        }
+        i++;
     }
 
 }
