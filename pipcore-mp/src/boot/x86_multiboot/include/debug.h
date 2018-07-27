@@ -48,13 +48,14 @@
 /**
  * \brief Strings for debugging output.
  */
-#define CRITICAL	0 //!< Critical output
-#define	ERROR		1 //!< Error output
-#define WARNING		2 //!< Warning output
-#define	INFO		3 //!< Information output
-#define LOG		4 //!< Log output
-#define TRACE		5 //!< Annoying, verbose output
-
+enum {
+    CRITICAL =  0, //!< Critical output
+    ERROR =     1, //!< Error output
+    WARNING =   2, //!< Warning output
+    INFO =      3, //!< Information output
+    LOG =       4, //!< Log output
+    TRACE =     5 //!< Annoying, verbose output
+};
 #define True 1
 #define False 0
 
@@ -98,6 +99,39 @@
  * \brief Defines the appropriate DEBUGDEC behavior.
  */
 #define DEBUGDEC(...)
+
+/**
+ * \fn isKernel(uint32_t cs)
+ * \brief Determines if we're in kernel mode or not.
+ * \param cs Code segment
+ * \return 1 if we're in kernel mode, 0 else
+ */
+#define dumpRegs(is, outputLevel) \
+do { \
+    DEBUG(outputLevel, "Register dump: eax=%x, ebx=%x, ecx=%x, edx=%x\r\n", \
+          GENERAL_REG(is, eax), \
+          GENERAL_REG(is, ebx), \
+          GENERAL_REG(is, ecx), \
+          GENERAL_REG(is, edx)); \
+    DEBUG(outputLevel, "               edi=%x, esi=%x, ebp=%x, esp=%x\r\n", \
+          GENERAL_REG(is, edi), \
+          GENERAL_REG(is, esi), \
+          GENERAL_REG(is, ebp), \
+          OPTIONAL_REG(is, useresp)); \
+    if(isKernel(OPTIONAL_REG(is, cs))) \
+    { \
+        DEBUG(outputLevel, "               cs=%x, eip=%x, int=%x\r\n", \
+              OPTIONAL_REG(is, cs), \
+              OPTIONAL_REG(is, eip), \
+              OPTIONAL_REG(is, int_no)); \
+    } else { \
+        DEBUG(outputLevel, "               cs=%x, ss=%x, eip=%x, int=%x\r\n", \
+              OPTIONAL_REG(is, cs), \
+              OPTIONAL_REG(is, ss), \
+              OPTIONAL_REG(is, eip), \
+              OPTIONAL_REG(is, int_no)); \
+    } \
+} while (0);
 
 #endif
 

@@ -38,8 +38,8 @@
 #define IAL_VERSION				"0.1"
 
 #define SIZEOF_CTX				sizeof(int_ctx_t)
-#define GENERAL_REG(a, c)		a->regs.c
-#define OPTIONAL_REG(a, c)		a->c
+#define GENERAL_REG(a, c)       (((int_ctx_t *)a)->regs.c)
+#define OPTIONAL_REG(a, c)      (((int_ctx_t *)a)->c)
 
 #define PIPFLAGS				((uintptr_t*)0xFFFFFFFC)
 #define INTLEVEL_GET			(*PIPFLAGS & 0xFFFFFF00) >> 8
