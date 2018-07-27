@@ -64,6 +64,7 @@ krnstack = .; _krnstack = .; __krnstack = .;
 *(.krnstack)
 . = ALIGN(4096);
 }
+__kernel_end = .;
 
 /* Multiplexer load address defined during make (Makefile.inc), used in multiplexer.s */
 .multiplexer 0x700000 :

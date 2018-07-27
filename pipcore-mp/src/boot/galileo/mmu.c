@@ -234,7 +234,9 @@ void initFreePageList(uintptr_t base, uintptr_t length)
  */
 uint32_t* allocPage()
 {
-
+    if (allocatedPages >= pageCount){
+        DEBUG(CRITICAL, "No more free memory available");
+    }
     uint32_t* res = firstFreePage;
     firstFreePage = (uint32_t*)(*res);
 
@@ -345,21 +347,22 @@ void initMmu()
     DEBUG(TRACE,"Mapping the kernel space");
     /* Map the kernel space */
     uint32_t curAddr = 0;
-    extern uint32_t end;
-
+    extern uint32_t end, __kernel_end, __multiplexer, __krnstack;
     DEBUG(TRACE,"Map kernel, stack up to root partition");
     /* Map kernel, stack up to root partition */
-    while(curAddr <= (uint32_t)(/* &end */ /* RAM_END */0x700000))
+    while(curAddr < (uint32_t)(/* &end */ /* RAM_END */&__kernel_end))
     {
         mapPageWrapper(kernelDirectory, curAddr, curAddr, 0);
         curAddr += PAGE_SIZE;
     }
+
+    mapPageWrapper(kernelDirectory, &__krnstack, &__krnstack, 0);
 	DEBUG(TRACE, "Kernel directory is at %x", kernelDirectory);
 
 
     DEBUG(TRACE,"Mapping the root partition in userland");
 	/* Map root partition in userland */
-	curAddr = 0x700000;
+	curAddr = &__multiplexer;
 	while(curAddr <= (uint32_t)(&end /* RAM_END */ /* 0xFFFFE000 */))
 	{
 		mapPageWrapper(kernelDirectory, curAddr, curAddr, 1);
@@ -367,7 +370,7 @@ void initMmu()
 	}
 
     mapPageWrapper(kernelDirectory, 0xB8000, 0xB8000, 1);
-	//mark_kernel_global();
+	mark_kernel_global();
 
     DEBUG(TRACE,"pseudo-prepare kernel directory, removing page table from free page list");
 	/* First, pseudo-prepare kernel directory, removing potential page tables from free page list */
@@ -454,7 +457,6 @@ void initMmu()
 	mapPageWrapper(kernelDirectory, (uint32_t)0xB8000, 0xFFFFE000, 1);
 
 	// Fill Virtu. IDT info
-	extern uint32_t __multiplexer;
 	*virt_intv = (uint32_t)(&__multiplexer); // Multiplexer load addr
 
 	DEBUG(TRACE, "Building linear memory space");
@@ -475,7 +477,7 @@ void initMmu()
 
 	/* We should be done with page allocation and stuff : the remaining pages should be available as memory for the partition */
 	/* First prepare all pages : pages required for prepare should be deleted from free page list */
-	while((pg = (uint32_t)allocPage()) && curAddr < ramEnd) {
+	while((pg = (uint32_t)allocPage()) && allocatedPages < pageCount) {
 		mapPageC((uintptr_t)kernelDirectory, pg, curAddr, 1);
 		curAddr += 0x1000;
 	}

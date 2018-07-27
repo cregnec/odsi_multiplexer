@@ -220,6 +220,9 @@ void initFreePageList(uintptr_t base, uintptr_t length)
  */
 uint32_t* allocPage()
 {
+    if (allocatedPages >= pageCount){
+        DEBUG(CRITICAL, "No more free memory available");
+    }
 
     uint32_t* res = firstFreePage;
     firstFreePage = (uint32_t*)(*res);
@@ -326,23 +329,24 @@ void initMmu()
 
     /* Map the kernel space */
     uint32_t curAddr = 0;
-    extern uint32_t end;
+    extern uint32_t end, __kernel_end, __multiplexer, __krnstack;
 
     /* Map kernel, stack up to root partition */
-    while(curAddr <= (uint32_t)(/* &end */ /* RAM_END */0x700000))
+    while(curAddr <= (uint32_t)(/* &end */ /* RAM_END */&__kernel_end))
     {
         mapPageWrapper(kernelDirectory, curAddr, curAddr, 0);
         curAddr += PAGE_SIZE;
     }
 
 	/* Map root partition in userland */
-	curAddr = 0x700000;
+	curAddr = &__multiplexer;
 	while(curAddr <= (uint32_t)(&end /* RAM_END */ /* 0xFFFFE000 */))
 	{
 		mapPageWrapper(kernelDirectory, curAddr, curAddr, 1);
 		curAddr += PAGE_SIZE;
 	}
 
+    mapPageWrapper(kernelDirectory, &__krnstack, &__krnstack, 0);
 	/* Map each platform-specific device */
 	/* uint32_t vga = 0xB8000;
 	for(vga = 0xB8000; vga < 0xC0000; vga += 0x1000)
@@ -445,7 +449,6 @@ void initMmu()
 	mapPageWrapper(kernelDirectory, (uint32_t)0xB8000, 0xFFFFE000, 1);
 
 	// Fill Virtu. IDT info
-	extern uint32_t __multiplexer;
 	*virt_intv = (uint32_t)(&__multiplexer); // Multiplexer load addr
 
 	DEBUG(TRACE, "Building linear memory space\n");
@@ -458,7 +461,7 @@ void initMmu()
 
 	/* We should be done with page allocation and stuff : the remaining pages should be available as memory for the partition */
 	/* First prepare all pages : pages required for prepare should be deleted from free page list */
-	while((pg = (uint32_t)allocPage()) && curAddr <= 0xFFFFD000) {
+	while((pg = (uint32_t)allocPage()) && allocatedPages < pageCount) {
 		mapPageC((uintptr_t)kernelDirectory, pg, curAddr, 1);
 		curAddr += 0x1000;
 	}
