@@ -3,7 +3,7 @@
     url = https://github.com/ymah/libodsi.git
 [submodule "pip-freertos"]
     path = pipcore-mp/src/partitions/x86/pip-freertos
-    url = https://github.com/ymah/pip-freertos.git
+    url = git@github.com:cregnec/odsi_freertos.git
 [submodule "libfreertos"]
 	path = libfreertos
 	url = https://github.com/ymah/libfreertos.git
