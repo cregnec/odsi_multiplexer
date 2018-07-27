@@ -16,8 +16,24 @@
 
 #include <stdint.h>
 
+/**
+ * \brief Strings for debugging output.
+ */
+enum {
+    CRITICAL =  0, //!< Critical output
+    ERROR =     1, //!< Error output
+    WARNING =   2, //!< Warning output
+    INFO =      3, //!< Information output
+    LOG =       4, //!< Log output
+    TRACE =     5 //!< Annoying, verbose output
+};
+
 #ifndef __pack
 #define __pack __attribute__((packed))
+#endif
+
+#ifndef LOGLEVEL
+#define LOGLEVEL LOG
 #endif
 
 /**
@@ -45,6 +61,48 @@ typedef struct __pack vidt_int_ctx_s
 	uint32_t valid;
 	uint32_t nfu[4];
 } vidt_int_ctx_t;
+
+/**
+ * \struct int_stack_s
+ * \brief Stack context from interrupt/exception
+ */
+typedef const struct int_stack_s
+{
+    pushad_regs_t regs;//!< Interrupt handler saved regs
+    uint32_t int_no; //!< Interrupt number
+    uint32_t err_code; //!< Interrupt error code
+    uint32_t eip; //!< Execution pointer
+    uint32_t cs; //!< Code segment
+    uint32_t eflags; //!< CPU flags
+    /* only present when we're coming from userland */
+    uint32_t useresp; //!< User-mode ESP
+    uint32_t ss; //!< Stack segment
+} int_ctx_t ;
+
+#define DEBUG(l,a,...) if(l<=LOGLEVEL){ printf(#l " [%s:%d] " a, __FILE__, __LINE__, ##__VA_ARGS__);}
+
+#define SIZEOF_CTX              sizeof(int_ctx_t)
+#define GENERAL_REG(a, c)       (((int_ctx_t *)a)->regs.c)
+#define OPTIONAL_REG(a, c)      (((int_ctx_t *)a)->c)
+
+#define dumpRegs(is, outputLevel) \
+do { \
+    DEBUG(outputLevel, "Register dump: eax=%x, ebx=%x, ecx=%x, edx=%x\r\n", \
+          GENERAL_REG(is, eax), \
+          GENERAL_REG(is, ebx), \
+          GENERAL_REG(is, ecx), \
+          GENERAL_REG(is, edx)); \
+    DEBUG(outputLevel, "               edi=%x, esi=%x, ebp=%x, esp=%x\r\n", \
+          GENERAL_REG(is, edi), \
+          GENERAL_REG(is, esi), \
+          GENERAL_REG(is, ebp), \
+          OPTIONAL_REG(is, useresp)); \
+    DEBUG(outputLevel, "               cs=%x, ss=%x, eip=%x, int=%x\r\n", \
+          OPTIONAL_REG(is, cs), \
+          OPTIONAL_REG(is, ss), \
+          OPTIONAL_REG(is, eip), \
+          OPTIONAL_REG(is, int_no)); \
+} while (0);
 
 /* VIDT structure
 

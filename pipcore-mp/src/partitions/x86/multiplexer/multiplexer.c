@@ -9,7 +9,6 @@
 #include <pip/fpinfo.h>
 
 #include "scheduler.h"
-#include "serial.h"
 
 #define ADDR_TO_MAP 0xA000000
 #define MAX_PAGE 0x8000
@@ -24,6 +23,8 @@ void *securePartitionEntry;
 
 extern void* _partition_normal, _epartition_normal;
 void *normalPartitionEntry;
+
+uint32_t _phy_dma_page, _v_dma_page;
 
 void parse_bootinfo(pip_fpinfo* bootinfo)
 {
@@ -107,7 +108,7 @@ uint32_t init_freertos_partition(uint32_t phy_dma_page, uint32_t v_dma_page)
     }
 
 
-    printf("Mapping stack... ");
+    printf("Mapping stack... \r\n");
     uint32_t stack_off = 0;
     uint32_t stack_addr;
     for(stack_off = 0; stack_off <= 0x10000; stack_off+=0x1000)
@@ -133,7 +134,7 @@ uint32_t init_freertos_partition(uint32_t phy_dma_page, uint32_t v_dma_page)
     printf("Task VIDT at %x\r\n",vidt);
 
     vidt->vint[0].eip = load_addr;
-    vidt->vint[0].esp = 0xB10000 + 0x1000 - sizeof(uint32_t);
+    vidt->vint[0].esp = 0xB10000 + 0x8000 - sizeof(uint32_t);
     vidt->flags = 0x1;
 
 
@@ -239,8 +240,9 @@ uint32_t init_secure_partition()
     printf("Task VIDT at %x\r\n",vidt);
 
     vidt->vint[0].eip = load_addr;
-    vidt->vint[0].esp = 0xB10000 + 0x1000 - sizeof(uint32_t);
+    vidt->vint[0].esp = 0xB10000 + 0x7000 - sizeof(uint32_t);
     vidt->flags = 0x1;
+    printf("Partition stack is at 0x%x\r\n", vidt->vint[0].esp);
 
     if (mapPageWrapper((uint32_t)vidt, (uint32_t)securePartitionEntry, (uint32_t)0xFFFFF000)){
         printf("Failed to map Vidt\r\n");
@@ -328,8 +330,9 @@ uint32_t init_normal_partition()
     printf("Task VIDT at %x\r\n",vidt);
 
     vidt->vint[0].eip = load_addr;
-    vidt->vint[0].esp = 0xB10000 + 0x1000 - sizeof(uint32_t);
+    vidt->vint[0].esp = 0xB10000 + 0x9000 - sizeof(uint32_t);
     vidt->flags = 0x1;
+    printf("Partition stack is at 0x%x\r\n", vidt->vint[0].esp);
 
     if (mapPageWrapper((uint32_t)vidt, (uint32_t)normalPartitionEntry, (uint32_t)0xFFFFF000)){
         printf("Failed to map Vidt\r\n");
@@ -346,9 +349,16 @@ void main(uint32_t phy_dma_page, uint32_t v_dma_page)
 
     uint32_t paging = initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
 
+    printf("phy_dma_page: 0x%x, v_dma_page: 0x%x\r\n", phy_dma_page, v_dma_page);
     // if (!init_freertos_partition(phy_dma_page, v_dma_page)){
+    //     printf("Failed to initialize freertos partition\r\n");
+    //     return;
+    // }
+    _phy_dma_page = phy_dma_page;
+    _v_dma_page = v_dma_page;
+
     if (!init_normal_partition()){
-        printf("Failed to initialize freertos partition\r\n");
+        printf("Failed to initialize normal partition\r\n");
         return;
     }
 
@@ -360,6 +370,7 @@ void main(uint32_t phy_dma_page, uint32_t v_dma_page)
     printf("Initlializing vcpus\r\n");
     initialize_vcpu(securePartitionEntry);
     initialize_vcpu(normalPartitionEntry);
+    // initialize_vcpu(partitionEntry);
 
     printf("Initlializing timer isr\r\n");
 

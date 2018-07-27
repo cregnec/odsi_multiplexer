@@ -26,7 +26,14 @@ timerRoutineAsm:
     .extern timerRoutine
     call timerRoutine
 
-
+.globl dmaAddressRoutineAsm;
+.align 4
+dmaAddressRoutineAsm:
+    push %ecx
+    push %ebx
+    push %eax
+    .extern dmaAddressRoutine
+    call dmaAddressRoutine
 
 .globl virtualSerialRoutineAsm;
 .align 4
@@ -36,3 +43,12 @@ virtualSerialRoutineAsm:
     push %eax
     .extern virtualSerialRoutine
     call virtualSerialRoutine
+
+.globl faultRoutineAsm;
+.align 4
+faultRoutineAsm:
+    push %ecx
+    push %ebx
+    push %eax
+    .extern faultRoutine
+    call faultRoutine

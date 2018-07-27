@@ -384,30 +384,30 @@ genericHandler (int_ctx_t *is)
 		target = PARTITION_ROOT;
 		from = readPhysicalNoFlags(PARTITION_CURRENT, indexPR());
 	} else {
-		IAL_DEBUG(CRITICAL, "Got fault interrupt %d.\r\n", is->int_no);
+		IAL_DEBUG(LOG, "Got fault interrupt %d.\r\n", is->int_no);
 
 		/* Page Fault */
 		if(is->int_no == 0xE)
 		{
 			uint32_t cr2;
 			__asm volatile("MOV %%CR2, %0;":"=r"(cr2));
-			IAL_DEBUG (CRITICAL, "CR2 set to %x.\r\n", cr2);
+			IAL_DEBUG (LOG, "CR2 set to %x.\r\n", cr2);
 			data1 = cr2;
-			dumpRegs(is, CRITICAL);
+			dumpRegs(is, LOG);
 		}
 
 		if(is->int_no == 0xD)
 		{
-			IAL_DEBUG (CRITICAL, "Protection fault error code set to %x.\r\n", is->err_code);
-			IAL_DEBUG (CRITICAL, "Partition %x faulted at EIP %x.\r\n", PARTITION_CURRENT, is->eip);
-			dumpRegs(is, CRITICAL);
+			IAL_DEBUG (LOG, "Protection fault error code set to %x.\r\n", is->err_code);
+			IAL_DEBUG (LOG, "Partition %x faulted at EIP %x.\r\n", PARTITION_CURRENT, is->eip);
+			dumpRegs(is, LOG);
 		}
 
 
 		/* Kernel faults should not happen. Panic. */
 		if (isKernel(is->cs))
 		{
-			IAL_DEBUG (CRITICAL, "Encountered fault (%x) within kernel. Halting system.\r\n", is->int_no);
+			IAL_DEBUG (LOG, "Encountered fault (%x) within kernel. Halting system.\r\n", is->int_no);
 			panic(is);
 		}
 
