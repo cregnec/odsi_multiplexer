@@ -36,6 +36,22 @@ TASK* vcpu_runqueue_find(VCPU* vcpu, uint32_t partition)
     return runqueue;
 }
 
+TASK* vcpu_runqueue_mapped(VCPU* vcpu, uint32_t vaddr)
+{
+    uint32_t test_page = (uint32_t) Pip_AllocPage();
+    TASK *runqueue = vcpu->task;
+    while (runqueue){
+        if (!Pip_AddVAddr(test_page, runqueue->partition_entry, vaddr, 1, 1, 1)){
+            break;
+        }
+        runqueue = runqueue->next;
+    }
+    Pip_FreePage(test_page);
+
+    return runqueue;
+}
+
+
 void vcpu_runqueue_append(VCPU* vcpu, TASK* task)
 {
     TASK **runqueue = &(vcpu->task);
@@ -119,7 +135,7 @@ void switch_to_vcpu(VCPU* vcpu)
         if (next_task->suspended_child){
             uint32_t suspended_child = next_task->suspended_child;
             next_task->suspended_child = 0;
-            DEBUG(INFO, "Asking a parent partition (%x) to resume a child partition (%x)\r\n", next_task->partition_entry, suspended_child);
+            DEBUG(TRACE, "Asking a parent partition (%x) to resume a child partition (%x)\r\n", next_task->partition_entry, suspended_child);
             Pip_Notify(next_task->partition_entry, 0x81, suspended_child, 0);
         } else {
             Pip_Resume(next_task->partition_entry, 0);
@@ -134,16 +150,16 @@ uint32_t vcpu_index(VCPU* vcpu)
 
 void save_task_caller(uint32_t caller)
 {
-    TASK* task = current_vcpu->task;
     /* if caller is in runqueue of current vcpu */
     if (caller == 0 || vcpu_runqueue_find(current_vcpu, caller)){
         return;
     }
+    TASK* task = vcpu_runqueue_mapped(current_vcpu, caller);
 
     // if caller is a child of multiplexer
-    if (Pip_MappedInChild(caller)){
+    if (task){
         /* if a sub partition is suspended.*/
-        DEBUG(INFO, "Save suspended child partition 0x%x for 0x%x\r\n", caller, task->partition_entry);
+        DEBUG(TRACE, "Save suspended child partition 0x%x for 0x%x\r\n", caller, task->partition_entry);
         if (task->suspended_child){
             DEBUG(ERROR, "A suspended paritition was not resumed\r\n");
         }
