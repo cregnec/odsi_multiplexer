@@ -4,6 +4,7 @@
 #include <pip/api.h>
 #include <pip/vidt.h>
 #include <pip/debug.h>
+#include "scheduler.h"
 
 uint32_t* irs_stack = NULL;
 extern uint32_t _phy_dma_page, _v_dma_page;
@@ -15,7 +16,7 @@ schedule(caller);
 
 INTERRUPT_HANDLER(dmaAddressRoutineAsm,dmaAddressRoutine)
 Pip_VCLI();
-printf("Notify %x the dma address: 0x%x, 0x%x using page 0x%x\r\n", caller, _phy_dma_page, _v_dma_page, data1);
+DEBUG(INFO, "Notify %x the dma address: 0x%x, 0x%x using page 0x%x\r\n", caller, _phy_dma_page, _v_dma_page, data1);
 uint32_t* vaddr = (uint32_t *) Pip_RemoveVAddr(caller, data1);
 vaddr[0] = _phy_dma_page;
 vaddr[1] = _v_dma_page;
@@ -36,17 +37,18 @@ if (data2) {
 }
 
 INTERRUPT_HANDLER(faultRoutineAsm,faultRoutine)
-Pip_VSTI();
+Pip_VCLI();
 uint32_t vaddr = (uint32_t) Pip_RemoveVAddr(caller, data2);
 int_ctx_t* is = (int_ctx_t*) (vaddr | (data2 & 0xfff));
 Pip_AddVAddr(is, caller, data2, 1, 1, 1);
 if (is->int_no == 0xe){
-    printf("Fault %x from 0x%x at 0x%x\r\n", is->int_no, caller, data1);
+    DEBUG(INFO, "Fault %x from 0x%x at 0x%x\r\n", is->int_no, caller, data1);
 } else {
-    printf("Fault %x from 0x%x\r\n", is->int_no, caller);
+    DEBUG(INFO, "Fault %x from 0x%x\r\n", is->int_no, caller);
 }
-dumpRegs(is, CRITICAL);
-resume(caller);
+dumpRegs(is, INFO);
+mark_task_unrunnable(caller);
+schedule(0);
 }
 
 void init_isr()
@@ -55,7 +57,7 @@ void init_isr()
     if (irs_stack == NULL){
         irs_stack = (uint32_t*)Pip_AllocPage();
         irs_stack = irs_stack + (0x1000/sizeof(uint32_t) - 1);
-        printf("Stack address is 0x%x\r\n", irs_stack);
+        DEBUG(TRACE, "Stack address is 0x%x\r\n", irs_stack);
     }
 
     for (i=1; i<33; i++){
