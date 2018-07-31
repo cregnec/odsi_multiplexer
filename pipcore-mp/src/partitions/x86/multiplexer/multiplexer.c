@@ -11,7 +11,7 @@
 #include "scheduler.h"
 
 #define ADDR_TO_MAP 0xA000000
-#define MAX_PAGE 0x8000
+#define MAX_PAGE 0x4000
 #define NORMAL_MAX_PAGE 0x1000
 #define SECURE_MAX_PAGE 0x1000
 
@@ -348,38 +348,41 @@ void main(uint32_t phy_dma_page, uint32_t v_dma_page)
     parse_bootinfo(bootinfo);
 
     uint32_t paging = initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
+    printf("Initlializing vcpus\r\n");
+    initialize_vcpu();
 
     printf("phy_dma_page: 0x%x, v_dma_page: 0x%x\r\n", phy_dma_page, v_dma_page);
-    // if (!init_freertos_partition(phy_dma_page, v_dma_page)){
-    //     printf("Failed to initialize freertos partition\r\n");
-    //     return;
-    // }
+    if (!init_freertos_partition(phy_dma_page, v_dma_page)){
+        printf("Failed to initialize freertos partition\r\n");
+        return;
+    }
     _phy_dma_page = phy_dma_page;
     _v_dma_page = v_dma_page;
+    bind_partition_2_vcpu(partitionEntry, 0);
+
 
     if (!init_normal_partition()){
         printf("Failed to initialize normal partition\r\n");
         return;
     }
+    bind_partition_2_vcpu(normalPartitionEntry, 1);
 
     if (!init_secure_partition()){
         printf("Failed to initialize Secure Partition\r\n");
         return;
     }
+    bind_partition_2_vcpu(securePartitionEntry, 2);
 
-    printf("Initlializing vcpus\r\n");
-    initialize_vcpu(securePartitionEntry);
-    initialize_vcpu(normalPartitionEntry);
-    // initialize_vcpu(partitionEntry);
 
     printf("Initlializing timer isr\r\n");
 
     init_isr();
-    // Pip_Notify((uint32_t)partitionEntry, 0, phy_dma_page, v_dma_page);
-    // Pip_Resume((uint32_t)partitionEntry,0);
+
     printf("Start scheduling\r\n");
 
     schedule(0);
+
+    for(;;);
 
     printf("multiplexer finished...\r\n");
     return;
