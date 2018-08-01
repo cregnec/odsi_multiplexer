@@ -37,6 +37,7 @@ void main()
     for (;;){
         if (i%1000000 == 0){
             printf("I'm looping\r\n");
+            *(uint32_t*) 0x10000 = 0;
             i = 1;
         }
         i++;
