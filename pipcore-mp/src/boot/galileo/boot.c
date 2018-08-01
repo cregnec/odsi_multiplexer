@@ -79,15 +79,15 @@ pip_fpinfo* fpinfo;
  *
  * Spawns the multiplexer given into the first partition space.
  */
-extern uint32_t phy_dma_page, v_dma_page;
+extern uint32_t phy_dma_page, v_dma_page, root_stack_addr;
 void spawnFirstPartition()
 {
 	uint32_t multiplexer_cr3 = readPhysicalNoFlags(getRootPartition(), indexPD()+1);
-
+	extern uint32_t __kernel_end;
 	DEBUG(TRACE, "multiplexer cr3 is %x\r\n", multiplexer_cr3);
 
 	// Prepare kernel stack for multiplexer
-	uint32_t *usrStack = /*allocPage()*/(uint32_t*)0xFFFFE000 - sizeof(uint32_t), *krnStack = /*allocPage()*/(uint32_t*)0x300000;
+	uint32_t *usrStack = /*allocPage()*/(uint32_t*)root_stack_addr, *krnStack = /*allocPage()*/(uint32_t*)(&__kernel_end - 4);
 	setKernelStack((uint32_t)krnStack);
 
 	DEBUG(INFO, "kernel stack is %x\r\n", krnStack);

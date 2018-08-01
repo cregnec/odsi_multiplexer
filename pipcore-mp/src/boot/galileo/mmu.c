@@ -58,6 +58,8 @@ uint32_t phy_dma_page, v_dma_page;
 extern uint32_t placement_address; //!< Placement address, this should be unused.
 uint32_t test = 0;
 
+uint32_t root_stack_addr;
+
 /*!	\fn void mapPageC(uintptr_t pd, uintptr_t p, uintptr_t v)
 	\brief add a mapping to a physical page p into a given page directory pd and a virtual address v.
 	\param pd a page directory
@@ -370,21 +372,21 @@ void initMmu()
 	}
 
     mapPageWrapper(kernelDirectory, 0xB8000, 0xB8000, 1);
-	mark_kernel_global();
 
     DEBUG(TRACE,"pseudo-prepare kernel directory, removing page table from free page list");
-	/* First, pseudo-prepare kernel directory, removing potential page tables from free page list */
-	uint32_t j = 0;
-	for(j = 0; j < 0xFFFFF000; j+=0x1000)
-	{
-		uint32_t pc = pageCountMapPageC((uintptr_t)kernelDirectory, j);
-		uint32_t list[1];
-		if(pc == 1) {
-			list[0] = (uint32_t)allocPage();
-			memset((void*)list[0], 0x0, PAGE_SIZE);
-			prepareC((uintptr_t)kernelDirectory, j, list);
-		}
-	}
+    /* First, pseudo-prepare kernel directory, removing potential page tables from free page list */
+    uint32_t j = 0;
+    for(j = 0; j < 0xFFFFF000; j+=0x1000)
+    {
+        uint32_t pc = pageCountMapPageC((uintptr_t)kernelDirectory, j);
+        uint32_t list[1];
+        if(pc == 1) {
+            list[0] = (uint32_t)allocPage();
+            memset((void*)list[0], 0x0, PAGE_SIZE);
+            prepareC((uintptr_t)kernelDirectory, j, list);
+        }
+    }
+	mark_kernel_global();
 
 
     DEBUG(TRACE,"Map a linear memory space using page allocator");
@@ -454,7 +456,7 @@ void initMmu()
 	// Create fake IDT at 0xFFFFF000
 	uint32_t* virt_intv = allocPage();
 	mapPageWrapper(kernelDirectory, (uint32_t)virt_intv, 0xFFFFF000, 1);
-	mapPageWrapper(kernelDirectory, (uint32_t)0xB8000, 0xFFFFE000, 1);
+	// mapPageWrapper(kernelDirectory, (uint32_t)0xB8000, 0xFFFFE000, 1);
 
 	// Fill Virtu. IDT info
 	*virt_intv = (uint32_t)(&__multiplexer); // Multiplexer load addr
@@ -463,7 +465,9 @@ void initMmu()
 
     DEBUG(TRACE,"Build the multiplexer stack");
 	/* Build a multiplexer stack */
-	mapPageWrapper(kernelDirectory, (uint32_t)allocPage(), 0xFFFFD000, 1);
+    mapPageWrapper(kernelDirectory, (uint32_t)allocPage(), 0xFFFFD000, 1);
+	mapPageWrapper(kernelDirectory, (uint32_t)allocPage(), 0xFFFFE000, 1);
+    root_stack_addr = 0xFFFFF000 - 4;
 
     DEBUG(TRACE,"Map first partition info");
 	/* Map first partition info */
