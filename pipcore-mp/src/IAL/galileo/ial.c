@@ -106,7 +106,7 @@ uint32_t saveCaller(int_ctx_t *is)
 		VIDT_INT_ESP_SET(0, OPTIONAL_REG(is, useresp) - SIZEOF_CTX);
 		IAL_DEBUG(INFO, "Set resume stack to %x.\r\n", OPTIONAL_REG(is, useresp) - SIZEOF_CTX);
 
-		dumpRegs((void*)(OPTIONAL_REG(is, useresp)) - SIZEOF_CTX, TRACE);
+		dumpRegs((OPTIONAL_REG(is, useresp) - SIZEOF_CTX), TRACE);
 
 		/* Push current state as well, which is stored into 0xFFFFFFFC */
 		*(uintptr_t*)(OPTIONAL_REG(is, useresp) - SIZEOF_CTX - sizeof(uintptr_t)) = *PIPFLAGS;
@@ -407,6 +407,7 @@ genericHandler (int_ctx_t *is)
 		/* Kernel faults should not happen. Panic. */
 		if (isKernel(is->cs))
 		{
+			for(;;);
 			IAL_DEBUG (LOG, "Encountered fault (%x) within kernel. Halting system.\r\n", is->int_no);
 			panic(is);
 		}
