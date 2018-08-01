@@ -3,6 +3,10 @@
 
 #include "vidt.h"
 
+#ifndef LOGLEVEL
+#define LOGLEVEL ERROR
+#endif
+
 #define DEBUG(l,a,...) if(l<=LOGLEVEL){ printf(#l " [%s:%d] " a, __FILE__, __LINE__, ##__VA_ARGS__);}
 
 #define SIZEOF_CTX              sizeof(int_ctx_t)

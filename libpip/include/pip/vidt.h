@@ -32,9 +32,6 @@ enum {
 #define __pack __attribute__((packed))
 #endif
 
-#ifndef LOGLEVEL
-#define LOGLEVEL LOG
-#endif
 
 /**
  * \struct registers

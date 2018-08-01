@@ -43,6 +43,7 @@ void* Pip_AllocPage(void)
 {
     if (nb_free_pages <=0){
         Pip_Debug_Puts("LibPip2: no more free pages available\r\n");
+        return NULL;
     }
     void* ret = Pager_FirstFreePage;
 		if(!ret)
