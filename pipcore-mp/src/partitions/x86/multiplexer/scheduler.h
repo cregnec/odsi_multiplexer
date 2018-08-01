@@ -21,6 +21,7 @@ typedef struct _task {
 
 typedef struct _vcpu {
     struct _task* task;
+    struct _task* current_task;
     struct _vcpu* next;
     bool idle;
 } VCPU;

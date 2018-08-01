@@ -123,8 +123,10 @@ TASK* vcpu_internal_schedule(VCPU* vcpu)
 void switch_to_vcpu(VCPU* vcpu)
 {
     TASK* next_task = vcpu_internal_schedule(vcpu);
+    vcpu->current_task = next_task;
     if (!next_task){
         DEBUG(CRITICAL, "no available task at current_vcpu\r\n");
+        update_vcpu_status(vcpu);
     }
     DEBUG(TRACE, "next task partition: %x\r\n", next_task->partition_entry);
     if (!next_task->started){
@@ -154,7 +156,7 @@ void save_task_caller(uint32_t caller)
     if (caller == 0 || vcpu_runqueue_find(current_vcpu, caller)){
         return;
     }
-    TASK* task = vcpu_runqueue_mapped(current_vcpu, caller);
+    TASK* task = current_vcpu->current_task;
 
     // if caller is a child of multiplexer
     if (task){
