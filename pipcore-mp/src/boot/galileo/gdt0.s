@@ -37,14 +37,17 @@ extern gp
 global gdtFlush
 gdtFlush:
     lgdt [gp] ; Load the GDT
+    mov eax, cr0
+    or al, 1
+    mov cr0, eax
+    jmp 0x08:flush2 ; Far jump to our newly, freshly-created GDT entry
+flush2:
     mov ax, 0x10 ; Set segments to kernel land
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    jmp 0x08:flush2 ; Far jump to our newly, freshly-created GDT entry
-flush2:
     ret ; Get back to business
 
 global tssFlush
@@ -63,7 +66,7 @@ cg_%1:
 	retf
 %endmacro
 
-; Callgate stack layout: 
+; Callgate stack layout:
 ;	usereip
 ;	cs
 ;	args, ...
@@ -134,5 +137,11 @@ CG_GLUE addVAddr		, 6
 CG_GLUE resume			, 2
 CG_GLUE removeVAddr		, 2
 CG_GLUE	mappedInChild	, 1
+CG_GLUE deletePartition     , 1
+CG_GLUE collect             , 2
 
 CG_GLUE_NOARG  timerGlue
+
+; create and set kernel stack for each task
+CG_GLUE_NOARG createTssGlue
+CG_GLUE_CTX setTssGlue  , 1

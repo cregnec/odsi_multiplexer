@@ -5,7 +5,7 @@
 #include "pip/api.h"
 
 /* Declare all sub-__Arch_APICall methods from a single macro */
-#define __Arch_APICall(a, b, args...) __Arch_APICall_##b(a, args)
+#define __Arch_APICall(a, b, ...) __Arch_APICall_##b(a, ##__VA_ARGS__)
 
 /* Those functions are implemeted in apicall.c */
 uint32_t __Arch_APICall_0(uint32_t call);

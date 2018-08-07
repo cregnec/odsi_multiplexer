@@ -22,7 +22,7 @@
 	pop	0xfffffffc
 	ret
 .endm
-	
+
 CG_HELPER_INTMASKED	outb, 			$0x30,	2
 CG_HELPER_INTMASKED	inb, 			$0x38,	1
 CG_HELPER_INTMASKED	outw, 			$0x40,	2
@@ -45,3 +45,5 @@ CG_HELPER       mappedInChild,  $0xA8, 1
 CG_HELPER       deletePartition,$0xB0, 1
 CG_HELPER       collect,        $0xB8, 2
 
+CG_HELPER 		createTss,		$0xC0, 0
+CG_HELPER 		setTss,			$0xC8, 1

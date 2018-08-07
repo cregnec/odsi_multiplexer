@@ -2,7 +2,7 @@
 #define __PIPCALL__
 
 #define ARCH_INDEPENDANT    0
-#define ARCH_DEPENDANT      11
+#define ARCH_DEPENDANT      13
 
 /* Architecture-independant entries */
 #define CREATEPARTITION     (ARCH_INDEPENDANT)
@@ -16,5 +16,7 @@
 #define MAPPEDINCHILD       (ARCH_INDEPENDANT + 8)
 #define DELETEPARTITION     (ARCH_INDEPENDANT + 9)
 #define COLLECT             (ARCH_INDEPENDANT + 10)
+#define CREATETSS           (ARCH_INDEPENDANT + 11)
+#define SETTSS              (ARCH_INDEPENDANT + 12)
 
 #endif

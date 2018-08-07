@@ -19,6 +19,9 @@ uint32_t __Arch_APICall_0(uint32_t call)
         case TIMER:
             callptr = pip_time;
             break;
+        case CREATETSS:
+            callptr = createTss;
+            break;
         default:
             return 0;
     }
@@ -48,6 +51,9 @@ uint32_t __Arch_APICall_1(uint32_t call, uint32_t a)
             break;
         case INL:
             callptr = inl;
+            break;
+        case SETTSS:
+            callptr = setTss;
             break;
         default:
             return 0;

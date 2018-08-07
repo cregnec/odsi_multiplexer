@@ -84,6 +84,20 @@ TASK* vcpu_runqueue_remove_head(VCPU* vcpu)
     return task;
 }
 
+void update_vcpu_status(VCPU* vcpu)
+{
+    bool idle = true;
+    TASK* task = vcpu->task;
+    while (task) {
+        if (task->runnable){
+            idle = false;
+            DEBUG(TRACE, "set vcpu not idle\r\n");
+        }
+        task = task->next;
+    }
+    vcpu->idle = idle;
+}
+
 void bind_partition_2_vcpu(uint32_t partition, uint32_t vcpu_id)
 {
     if (vcpu_id >= NUM_VCPUS){
@@ -98,6 +112,8 @@ void bind_partition_2_vcpu(uint32_t partition, uint32_t vcpu_id)
     task->suspended_child = 0;
     task->next = NULL;
     task->vcpu_id = vcpu_id;
+    task->kern_stack_id = Pip_CreateTss();
+    DEBUG(TRACE, "kern_stack_id is %d\r\n", task->kern_stack_id);
     vcpu_runqueue_append(&vcpus[vcpu_id], task);
 
     vcpus[vcpu_id].idle = false;
@@ -129,6 +145,9 @@ void switch_to_vcpu(VCPU* vcpu)
         update_vcpu_status(vcpu);
     }
     DEBUG(TRACE, "next task partition: %x\r\n", next_task->partition_entry);
+    Pip_SetTss(next_task->kern_stack_id);
+    DEBUG(TRACE, "kern_stack_id: %x\r\n", next_task->kern_stack_id);
+
     if (!next_task->started){
         next_task->started = true;
         DEBUG(TRACE, "Starting partition: 0x%x\r\n", next_task->partition_entry);
@@ -200,20 +219,6 @@ void schedule(uint32_t caller)
     }
     DEBUG(TRACE, "current_vcpu: %x\r\n", current_vcpu);
     switch_to_vcpu(current_vcpu);
-}
-
-void update_vcpu_status(VCPU* vcpu)
-{
-    bool idle = true;
-    TASK* task = vcpu->task;
-    while (task) {
-        if (task->runnable){
-            idle = false;
-            DEBUG(TRACE, "set vcpu not idle\r\n");
-        }
-        task = task->next;
-    }
-    vcpu->idle = idle;
 }
 
 void mark_task_unrunnable(uint32_t partition)

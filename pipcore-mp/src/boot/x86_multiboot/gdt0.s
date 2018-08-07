@@ -63,7 +63,7 @@ cg_%1:
 	retf
 %endmacro
 
-; Callgate stack layout: 
+; Callgate stack layout:
 ;	usereip
 ;	cs
 ;	args, ...
@@ -124,7 +124,7 @@ CG_GLUE_CTX inwGlue		, 1
 CG_GLUE_CTX outlGlue 		, 2
 CG_GLUE_CTX inlGlue 		, 1
 CG_GLUE_CTX outaddrlGlue 	, 2
-CG_GLUE_CTX dispatchGlue	, 5
+CG_GLUE_CTX dispatchGlue    , 5
 
 ; Those ones won't trigger a fault in caller
 CG_GLUE createPartition		, 5
@@ -138,3 +138,7 @@ CG_GLUE	deletePartition 	, 1
 CG_GLUE	collect 			, 2
 
 CG_GLUE_NOARG  timerGlue
+
+; create and set kernel stack for each task
+CG_GLUE_NOARG createTssGlue
+CG_GLUE_CTX setTssGlue  , 1

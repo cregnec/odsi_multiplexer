@@ -60,6 +60,8 @@ extern void *cg_removeVAddr;
 extern void *cg_mappedInChild;
 extern void *cg_deletePartition;
 extern void *cg_collect;
+extern void *cg_createTssGlue;
+extern void *cg_setTssGlue;
 
 /**
  * \struct gdt_entry_s
@@ -71,6 +73,13 @@ struct gdt_entry_s {
 	unsigned rpl;
 	unsigned segment;
 };
+
+#define MAX_KERN_STACK 5
+#define KERN_STACK_SIZE (1024*24) /* initPEntryTable recursive call uses too many memory on the stack */
+
+uint32_t ul_kern_stacks[MAX_KERN_STACK][KERN_STACK_SIZE];
+
+static uint32_t nb_kern_stack = 0;
 
 struct gdt_entry_s gdtEntries[] = {
 	{&cg_outbGlue, 		2, 0x3, 0x08}, /* 0x30 */
@@ -93,6 +102,8 @@ struct gdt_entry_s gdtEntries[] = {
 	{&cg_mappedInChild,	1, 0x3, 0x08}, /* 0xA8 */
 	{&cg_deletePartition,1,0x3, 0x08}, /* 0xB0 */
 	{&cg_collect,		1, 0x3, 0x08}, /* 0xB8 */
+	{&cg_createTssGlue,		0, 0x3, 0x08}, /* 0xC0 */
+	{&cg_setTssGlue,		1, 0x3, 0x08}, /* 0xC8 */
 };
 
 #define CG_COUNT (sizeof(gdtEntries)/sizeof(struct gdt_entry_s))
@@ -147,7 +158,7 @@ void buildCallgate(int num, void* handler, uint8_t args, uint8_t rpl, uint16_t s
 	gate.offset_low = (uint16_t)(addr & 0xFFFF);
 	gate.offset_high = (uint16_t)((addr >> 16) & 0xFFFF);
 	memcpy(&(gdt[num]), &gate, sizeof(struct gdt_entry)); /* Install call-gate into GDT */
-	
+
 	return;
 }
 
@@ -214,10 +225,31 @@ void gdtInstall(void)
 		e = &gdtEntries[i];
 		buildCallgate(6+i, e->handler, e->nargs, e->rpl, e->segment);
 	}
-	
+
 	DEBUG(INFO, "Callgate set-up\n");
 
 	gdtFlush();
 	tssFlush();
 }
 
+uint32_t createTssGlue()
+{
+	if (nb_kern_stack < MAX_KERN_STACK) {
+		nb_kern_stack ++;
+		return nb_kern_stack;
+	} else {
+		DEBUG(ERROR, "Maximum number of tss achieved \r\n");
+		return 0;
+	}
+}
+
+uint32_t setTssGlue(uint32_t kern_stack_id)
+{
+	if (kern_stack_id >= MAX_KERN_STACK || kern_stack_id < 1){
+		DEBUG(ERROR, "kern_stack_id is outside of allowed aximum number\r\n");
+		return 0;
+	}
+	setKernelStack((uint32_t)&ul_kern_stacks[kern_stack_id][0]);
+	DEBUG(TRACE, "ul_kern_stacks = %x\r\n", &ul_kern_stacks[kern_stack_id][0]);
+	return 1;
+}
