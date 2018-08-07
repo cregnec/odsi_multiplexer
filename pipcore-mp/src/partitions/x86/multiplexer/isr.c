@@ -47,7 +47,7 @@ if (is->int_no == 0xe){
 } else {
     DEBUG(ERROR, "Fault %x from 0x%x\r\n", is->int_no, caller);
 }
-dumpRegs(is, INFO);
+dumpRegs(is, ERROR);
 mark_task_unrunnable(caller);
 schedule(0);
 }

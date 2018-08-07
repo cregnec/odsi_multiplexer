@@ -49,7 +49,7 @@ void *create_partition(uint32_t load_addr, uint32_t base, uint32_t length, uint3
 
     void *partitionEntry, *partpd, *partsh1, *partsh2, *partsh3;
 
-    printf("Creating secure partition %x at %x, length %d\r\n", base,load_addr, length);
+    printf("Creating partition %x at %x, length %d\r\n", base,load_addr, length);
     partitionEntry = allocPage();
     partpd = allocPage();
     partsh1 = allocPage();
@@ -59,14 +59,14 @@ void *create_partition(uint32_t load_addr, uint32_t base, uint32_t length, uint3
             "Partition descriptor : %x \r\n\tpd : %x \r\n\tpartsh1 : %x \r\n\tpartsh2 : %x\r\n\tpartsh3 : %x\r\n",
             partitionEntry, partpd, partsh1, partsh2, partsh3);
 
-    printf("Creating secure partition\r\n");
+    printf("Creating partition\r\n");
     if (!createPartition((uint32_t) partitionEntry, (uint32_t) partpd,
             (uint32_t) partsh1, (uint32_t) partsh2, (uint32_t) partsh3)) {
-        printf("Failed to create secure partition\r\n");
+        printf("Failed to create partition\r\n");
         return 0;
     }
 
-    printf("Mapping secure partition code...\r\n");
+    printf("Mapping partition code...\r\n");
 
     for (offset = 0; offset < length; offset += 0x1000) {
         if (mapPageWrapper((uint32_t) (base + offset), partitionEntry,(uint32_t) (load_addr + offset))) {
