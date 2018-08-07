@@ -39,6 +39,8 @@
 #ifndef PIC8259_H
 #define PIC8259_H
 
+#include <stdint.h>
+
 #define PIC1		0x20	/* IO base address for master PIC */
 #define PIC2		0xA0	/* IO base address for slave PIC */
 #define PIC1_COMMAND	PIC1
@@ -59,8 +61,6 @@
 #define PIC_EOI		0x20
 #define PIC_READ_IRR                0x0a    /* OCW3 irq ready next CMD read */
 #define PIC_READ_ISR                0x0b    /* OCW3 irq service next CMD read */
-
-#define uint16_t unsigned short
 
 uint16_t pic_get_irr(void);
 uint16_t pic_get_isr(void);
