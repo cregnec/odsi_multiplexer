@@ -11,9 +11,9 @@
 #include "task.h"
 #include "string.h"
 
-#define BUFFER_SIZE		4095
+#define DMA_BUFFER_SIZE		4095
 
-static char dma_buffer[BUFFER_SIZE];
+static char dma_buffer[DMA_BUFFER_SIZE];
 
 static uint32_t bGalileo_UART0_DMAC_Initialized = FALSE;
 //static uint32_t bGalileo_UART1_DMAC_Initialized = FALSE;

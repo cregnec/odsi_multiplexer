@@ -7,7 +7,16 @@ LINKER=elf_ia32_efi.lds
 MAPFILE=RTOSDemo.map
 
 
+# ODSI_DEMO library
 
+LIB_ODSI_DEMO_INC_DIRS+=$(wildcard $(LIBODSIDEMO)/include/)
+LIB_ODSI_DEMO_INC_DIRS+=$(wildcard $(LIBODSIDEMO)/include/*/include/)
+LIB_ODSI_DEMO_INC_DIRS+=$(wildcard $(LIBODSIDEMO)/include/*/*/include/)
+LIB_ODSI_DEMO_INC_DIRS+=$(wildcard $(LIBODSIDEMO)/include/*/*/*/include/)
+LIB_ODSI_DEMO_INC_DIRS+=$(wildcard $(LIBODSIDEMO)/include/*/*/*/*/include/)
+LIB_ODSI_DEMO_INC_DIRS+=$(wildcard $(LIBODSIDEMO)/include/*/*/*/*/include/)
+
+LIB_ODSI_DEMO_LIB=$(LIBODSIDEMO)/lib/
 
 
 #FreeRTOS library
@@ -45,19 +54,7 @@ BLINKY_DIR=$(IA32DIR)/Blinky_Demo
 FULL_DIR=$(IA32DIR)/Full_Demo
 FULL_DIR_TASK=$(ROOTDIR)/Demo/Common/Minimal/
 
-# ODSI directories
-OSDI_DIR=$(IA32DIR)/ODSI
-INC_CLIENT_SIMPLE_DIR=$(OSDI_DIR)/Client_Simple/include
-INC_COMMUNICATE_SIMPLE_DIR=$(OSDI_DIR)/Communicate_Simple/include
-INC_CONFIG_SIMPLE_DIR=$(OSDI_DIR)/Config_Simple/include
-INC_DOMAINS_SIMPLE_DIR=$(OSDI_DIR)/Domains/include
-INC_ESP8266_DIR=$(OSDI_DIR)/ESP8266/include
-INC_KEYVAULT_SIMPLE_DIR=$(OSDI_DIR)/KeyVault_Simple/include
-INC_NWMANAGER_DIR=$(OSDI_DIR)/NWManager/include
-INC_SRC_DIR=$(OSDI_DIR)/src/include
-INC_SUPPORT_FILES_DIR=$(OSDI_DIR)/Support_Files/include
-INC_TOKEN_SIMPLE_DIR=$(OSDI_DIR)/Token_Simple/include
-INC_UTILS_DIR=$(OSDI_DIR)/utils/include
+SYSTEM_CALLS_IMPLEMENTATION_SRC=$(IA32DIR)/../../../Common/System/SystemCalls.c
 
 # IA32 RTOS files
 SUPPORT_SRC=$(wildcard $(SUPPORT_DIR)/*.c)
@@ -68,23 +65,7 @@ FULL_ASRC=$(wildcard $(FULL_DIR)/*.S)
 FULL_TASK_SRC=$(wildcard $(FULL_DIR_TASK)/*.c)
 DEMO_SRC=$(wildcard $(IA32DIR)/*.c)
 
-# ODSI files
-CLIENT_SIMPLE_SRC=$(wildcard $(OSDI_DIR)/Client_Simple/*.c)
-COMMUNICATE_SIMPLE_SRC=$(wildcard $(OSDI_DIR)/Communicate_Simple/*.c)
-CONFIG_SIMPLE_SRC=$(wildcard $(OSDI_DIR)/Config_Simple/*.c)
-DOMAINS_SIMPLE_SRC=$(wildcard $(OSDI_DIR)/Domains/*.c)
-ESP8266_SRC=$(wildcard $(OSDI_DIR)/ESP8266/*.c)
-KEYVAULT_SIMPLE_SRC=$(wildcard $(OSDI_DIR)/KeyVault_Simple/*.c)
-NWMANAGER_SRC=$(wildcard $(OSDI_DIR)/NWManager/*.c)
-NWMANAGER_PORTABLE_SRC=$(wildcard $(OSDI_DIR)/NWManager/portable/NW_Simple/*.c)
-SRC_CORE_SRC=$(wildcard $(OSDI_DIR)/src/core/*.c)
-SRC_ADAPTOR_SRC=$(wildcard $(OSDI_DIR)/src/adaptor/Simple/*.c)
-SUPPORT_FILES_FIFO_SRC=$(wildcard $(OSDI_DIR)/Support_Files/FIFO/*.c)
-SUPPORT_FILES_GALILEO_SRC=$(wildcard $(OSDI_DIR)/Support_Files/Galileo_Gen2_Board/*.c)
-SUPPORT_FILES_QUARK_SRC=$(wildcard $(OSDI_DIR)/Support_Files/Intel_Quark_x1000/*.c)
-TOKEN_SIMPLE_SRC=$(wildcard $(OSDI_DIR)/TokenSimple/*.c)
-UTILS_SRC=$(wildcard $(OSDI_DIR)/utils/*.c)
-UTILS_ADAPTOR_SRC=$(wildcard $(OSDI_DIR)/utils/adaptor/*.c)
+SYSTEM_CALLS_IMPLEMENTATION_OBJ=$(SYSTEM_CALLS_IMPLEMENTATION_SRC:.c=.o)
 
 # IA32 Object files
 SUPPORT_OBJ=$(SUPPORT_SRC:.c=.o)
@@ -95,24 +76,6 @@ FULL_OBJ+=$(FULL_ASRC:.S=.o)
 FULL_TASK_OBJ=$(FULL_TASK_SRC:.c=.o)
 DEMO_OBJ=$(DEMO_SRC:.c=.o)
 
-# ODSI Object files
-CLIENT_SIMPLE_OBJ=$(CLIENT_SIMPLE_SRC:.c=.o)
-COMMUNICATE_SIMPLE_OBJ=$(COMMUNICATE_SIMPLE_SRC:.c=.o)
-CONFIG_SIMPLE_OBJ=$(CONFIG_SIMPLE_SRC:.c=.o)
-DOMAINS_SIMPLE_OBJ=$(DOMAINS_SIMPLE_SRC:.c=.o)
-ESP8266_OBJ=$(ESP8266_SRC:.c=.o)
-KEYVAULT_SIMPLE_OBJ=$(KEYVAULT_SIMPLE_SRC:.c=.o)
-NWMANAGER_OBJ=$(NWMANAGER_SRC:.c=.o)
-NWMANAGER_PORTABLE_OBJ=$(NWMANAGER_PORTABLE_SRC:.c=.o)
-SRC_CORE_OBJ=$(SRC_CORE_SRC:.c=.o)
-SRC_ADAPTOR_OBJ=$(SRC_ADAPTOR_SRC:.c=.o)
-SUPPORT_FILES_FIFO_OBJ=$(SUPPORT_FILES_FIFO_SRC:.c=.o)
-SUPPORT_FILES_GALILEO_OBJ=$(SUPPORT_FILES_GALILEO_SRC:.c=.o)
-SUPPORT_FILES_QUARK_OBJ=$(SUPPORT_FILES_QUARK_SRC:.c=.o)
-TOKEN_SIMPLE_OBJ=$(TOKEN_SIMPLE_SRC:.c=.o)
-UTILS_OBJ=$(UTILS_SRC:.c=.o)
-UTILS_ADAPTOR_OBJ=$(UTILS_ADAPTOR_SRC:.c=.o)
-
 # Skip some unnecessary files
 SKIPOBJ=$(FULL_DIR_TASK)/sp_flop.o $(FULL_DIR_TASK)/comtest.o $(FULL_DIR_TASK)/comtest_strings.o $(FULL_DIR_TASK)/crhook.o $(FULL_DIR_TASK)/AltBlock.o $(FULL_DIR_TASK)/AltQTest.o $(FULL_DIR_TASK)/AltBlckQ.o $(FULL_DIR_TASK)/AltPollQ.o $(FULL_DIR_TASK)/crflash.o $(FULL_DIR_TASK)/flash.o $(FULL_DIR_TASK)/flash_timer.o
 
@@ -120,18 +83,7 @@ SKIPOBJ=$(FULL_DIR_TASK)/sp_flop.o $(FULL_DIR_TASK)/comtest.o $(FULL_DIR_TASK)/c
 CFLAGS=-I$(FULL_DIR)
 CFLAGS+=-I$(SUPPORT_DIR)
 
-# ODSI
-CFLAGS+=-I$(INC_CLIENT_SIMPLE_DIR)
-CFLAGS+=-I$(INC_COMMUNICATE_SIMPLE_DIR)
-CFLAGS+=-I$(INC_CONFIG_SIMPLE_DIR)
-CFLAGS+=-I$(INC_DOMAINS_SIMPLE_DIR)
-CFLAGS+=-I$(INC_ESP8266_DIR)
-CFLAGS+=-I$(INC_KEYVAULT_SIMPLE_DIR)
-CFLAGS+=-I$(INC_NWMANAGER_DIR)
-CFLAGS+=-I$(INC_SRC_DIR)
-CFLAGS+=-I$(INC_SUPPORT_FILES_DIR)
-CFLAGS+=-I$(INC_TOKEN_SIMPLE_DIR)
-CFLAGS+=-I$(INC_UTILS_DIR)
+CFLAGS+=$(foreach dir, $(LIB_ODSI_DEMO_INC_DIRS), -I$(dir))
 
 CFLAGS+=-I$(BLINKY_DIR)
 CFLAGS+=-I$(RTOS_SRCDIR)/include
@@ -160,8 +112,8 @@ ASFLAGS+= -m32 -Wa,--gdwarf2 -Wa,-march=pentium -c
 
 LIBGCC=$(shell dirname $(shell gcc -print-libgcc-file-name -m32))
 # Linker flags
-LDFLAGS=-T$(LINKER) -Map=$(BUILD_DIR)/$(MAPFILE) --gc-sections -L$(LIBGCC) -L$(LIBPIP_LIB) -L$(LIBGCC) -L$(LIBFREERTOS_LIB)  -melf_i386
-LDFLAGS2=-Telf.ld -Map=$(BUILD_DIR)/$(MAPFILE) --gc-sections -L$(LIBGCC) -L$(LIBPIP_LIB) -L$(LIBGCC) -L$(LIBFREERTOS_LIB) -lpip -melf_i386
+LDFLAGS=-T$(LINKER) -Map=$(BUILD_DIR)/$(MAPFILE) --gc-sections -L$(LIBGCC) -L$(LIBPIP_LIB) -L$(LIBGCC) -L$(LIBFREERTOS_LIB) -L$(LIB_ODSI_DEMO_LIB) -melf_i386
+LDFLAGS2=-Telf.ld -Map=$(BUILD_DIR)/$(MAPFILE) --gc-sections -L$(LIBGCC) -L$(LIBPIP_LIB) -L$(LIBGCC) -L$(LIBFREERTOS_LIB) -L$(LIB_ODSI_DEMO_LIB) -lpip -melf_i386
 
 
 BUILD_DIR=Build/
@@ -170,25 +122,17 @@ all: $(IMAGE)
 	echo "All done."
 
 clean:
-	rm -rf $(RTOS_OBJ) $(RTOS_IA32OBJ) $(SUPPORT_OBJ) $(BLINKY_OBJ) $(FULL_OBJ) $(FULL_TASK_OBJ) $(DEMO_OBJ) \
-	$(CLIENT_SIMPLE_OBJ) $(COMMUNICATE_SIMPLE_OBJ) $(CONFIG_SIMPLE_OBJ) $(DOMAINS_SIMPLE_OBJ) \
-	$(ESP8266_OBJ) $(KEYVAULT_SIMPLE_OBJ) $(NWMANAGER_OBJ) $(NWMANAGER_PORTABLE_OBJ) \
-	$(SRC_CORE_OBJ) $(SRC_ADAPTOR_OBJ) $(SUPPORT_FILES_FIFO_OBJ) $(SUPPORT_FILES_GALILEO_OBJ) \
-	$(SUPPORT_FILES_QUARK_OBJ) $(TOKEN_SIMPLE_OBJ) $(UTILS_OBJ) $(UTILS_ADAPTOR_OBJ)
+	rm -rf $(RTOS_OBJ) $(RTOS_IA32OBJ) $(SUPPORT_OBJ) $(BLINKY_OBJ) $(FULL_OBJ) $(FULL_TASK_OBJ) $(DEMO_OBJ)
 
 	rm -rf $(BUILD_DIR) $(IMAGE)
 	rm -rf function_addr.fun
 
-$(IMAGE): $(RTOS_OBJ) $(RTOS_IA32OBJ) $(SUPPORT_OBJ) $(BLINKY_OBJ) $(FULL_OBJ) $(FULL_TASK_OBJ) $(DEMO_OBJ) $(SKIPOBJ) $(RTOS_MEMOBJ) \
-	$(CLIENT_SIMPLE_OBJ) $(COMMUNICATE_SIMPLE_OBJ) $(CONFIG_SIMPLE_OBJ) $(DOMAINS_SIMPLE_OBJ) \
-	$(ESP8266_OBJ) $(KEYVAULT_SIMPLE_OBJ) $(NWMANAGER_OBJ) $(NWMANAGER_PORTABLE_OBJ) \
-	$(SRC_CORE_OBJ) $(SRC_ADAPTOR_OBJ) $(SUPPORT_FILES_FIFO_OBJ) $(SUPPORT_FILES_GALILEO_OBJ) \
-	$(SUPPORT_FILES_QUARK_OBJ) $(TOKEN_SIMPLE_OBJ) $(UTILS_OBJ) $(UTILS_ADAPTOR_OBJ)
+$(IMAGE): $(RTOS_OBJ) $(RTOS_IA32OBJ) $(SUPPORT_OBJ) $(BLINKY_OBJ) $(FULL_OBJ) $(FULL_TASK_OBJ) $(DEMO_OBJ) $(SYSTEM_CALLS_IMPLEMENTATION_OBJ) $(SKIPOBJ) $(RTOS_MEMOBJ)
 
 	mkdir -pv $(BUILD_DIR)
-	$(LD) $(LDFLAGS) $^ -o $@ -lgcc -lpip -lfreertos
-	$(LD) $(LDFLAGS) $^ -o $(BUILD_DIR)/$@ -lgcc -lpip -lfreertos
-	$(LD) $(LDFLAGS2) $^ -o $(BUILD_DIR)/FreeRTOS.elf -lgcc -lpip  -lfreertos
+	$(LD) $(LDFLAGS) $^ -o $@ -lgcc -lpip -lfreertos -lodsi
+	$(LD) $(LDFLAGS) $^ -o $(BUILD_DIR)/$@ -lgcc -lpip -lfreertos -lodsi
+	$(LD) $(LDFLAGS2) $^ -o $(BUILD_DIR)/FreeRTOS.elf -lgcc -lpip  -lfreertos -lodsi
 
 
 

@@ -42,7 +42,7 @@
 //------------------------------------------------------------------------------
 
 /// Size of SLCDC buffer in bytes.
-#define BUFFER_SIZE     320
+#define DMA_BUFFER_SIZE     320
 
 //------------------------------------------------------------------------------
 //         Global functions
@@ -77,7 +77,7 @@ void SLCDC_Configure(
 //------------------------------------------------------------------------------
 void SLCDC_Clear(void)
 {
-    memset((void *) AT91C_BASE_SLCDC->SLCDC_MEM, 0, BUFFER_SIZE);
+    memset((void *) AT91C_BASE_SLCDC->SLCDC_MEM, 0, DMA_BUFFER_SIZE);
 }
 
 //------------------------------------------------------------------------------

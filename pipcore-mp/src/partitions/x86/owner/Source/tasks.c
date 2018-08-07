@@ -1203,6 +1203,72 @@ void vTaskDelay(const TickType_t xTicksToDelay) {
 	}
 }
 
+void vTaskDelay_ms(const TickType_t xTicksToDelay) {
+	TickType_t xTimeToWake;
+	BaseType_t xAlreadyYielded = pdFALSE;
+
+    int i;
+    for(i=0;i<2000*xTicksToDelay;i++);
+    return ;
+	printf("Asking for %dms delay\r\n",(uint32_t)xTicksToDelay);
+	/* A delay time of zero just forces a reschedule. */
+	if (xTicksToDelay > (TickType_t) 0U) {
+		configASSERT(uxSchedulerSuspended == 0);
+		debug()
+		vTaskSuspendAll();
+		{
+			traceTASK_DELAY();
+
+			/* A task that is removed from the event list while the
+			 scheduler is suspended will not get placed in the ready
+			 list or removed from the blocked list until the scheduler
+			 is resumed.
+
+			 This task cannot be in an event list as it is the currently
+			 executing task. */
+
+			/* Calculate the time to wake - this may overflow but this is
+			 not a problem. */
+			xTimeToWake = xTickCount + xTicksToDelay;
+
+			/* We must remove ourselves from the ready list before adding
+			 ourselves to the blocked list as the same list item is used for
+			 both lists. */
+			if (uxListRemove(&(pxCurrentTCB->xGenericListItem))
+					== (UBaseType_t) 0) {
+				/* The current task must be in a ready list, so there is
+				 no need to check, and the port reset macro can be called
+				 directly. */
+
+				portRESET_READY_PRIORITY(pxCurrentTCB->uxPriority,
+						uxTopReadyPriority);
+
+			} else {
+
+				mtCOVERAGE_TEST_MARKER();
+
+			}
+
+			prvAddCurrentTaskToDelayedList(xTimeToWake);
+		}
+
+		xAlreadyYielded = xTaskResumeAll();
+
+	} else {
+		mtCOVERAGE_TEST_MARKER();
+	}
+
+	/* Force a reschedule if xTaskResumeAll has not already done so, we may
+	 have put ourselves to sleep. */
+	if (xAlreadyYielded == pdFALSE) {
+
+		portYIELD_WITHIN_API();
+
+	} else {
+		mtCOVERAGE_TEST_MARKER();
+	}
+}
+
 #endif /* INCLUDE_vTaskDelay */
 /*-----------------------------------------------------------*/
 

@@ -164,7 +164,7 @@ volatile int iReturn, iIndex = 0;
 }
 
 /**
- * strlen: measure ength of the string
+ * strlen: measure length of the string
  * @param str
  * @return length of the string
  */
@@ -189,6 +189,23 @@ void reverse(char s[])
 	char c;
 
 	for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
+		c = s[i];
+		s[i] = s[j];
+		s[j] = c;
+	}
+}
+
+/**
+ * safe_reverse:  reverse string s in place
+ * @param s string
+ * @param string_size the size of the string s
+ */
+void safe_reverse(char s[], int string_size)
+{
+	int i, j;
+	char c;
+
+	for (i = 0, j = string_size - 1; i<j; i++, j--) {
 		c = s[i];
 		s[i] = s[j];
 		s[j] = c;
@@ -238,6 +255,60 @@ char* itoa(int n, char s[], int base)
 	s[i] = '\0';
 	reverse(s);
 	return s;
+}
+
+/**
+ * safe_itoa:  convert n to characters in s
+ * @param n number to be converted
+ * @param s output string
+ * @param base base for conversion
+ * @param string_max_length length of character array, param s
+ * @result length of string
+ */
+int safe_itoa(int n, char s[], int base, int string_max_length)
+{
+	int i, sign;
+
+	if ((sign = n) < 0)  /* record sign */
+		n = -n;          /* make n positive */
+	i = 0;
+	do
+	{       /* generate digits in reverse order */
+		if(i > string_max_length - 1)
+		{
+			return 0;
+		}
+
+		if( base > 10 && ((n % base) > 10) )
+		{
+			s[i++] = n%base -10 + 'A';
+		}
+		else
+		{
+			s[i++] = n % base + '0';   /* get next digit */
+		}
+	}
+	while ((n /= base) > 0);     /* delete it */
+
+	if (sign < 0)
+	{
+		if(i > string_max_length - 1)
+		{
+			return 0;
+		}
+
+		s[i++] = '-';
+	}
+
+	if(i > string_max_length - 1)
+	{
+		return 0;
+	}
+
+	s[i] = '\0';
+	safe_reverse(s, i);
+
+	return i;
 }
 
 /**

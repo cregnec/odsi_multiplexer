@@ -15,7 +15,6 @@ fi
 
 make -C libpip/ VARIANT=virtual clean all || exit
 
-
 make -C libfreertos clean all || exit
 
 echo "Owner" && sleep 1

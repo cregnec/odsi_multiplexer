@@ -11,7 +11,7 @@
 #include <jansson.h>
 #include <curl/curl.h>
 
-#define BUFFER_SIZE  (256 * 1024)  /* 256 KB */
+#define DMA_BUFFER_SIZE  (256 * 1024)  /* 256 KB */
 
 #define URL_FORMAT   "https://api.github.com/repos/%s/%s/commits"
 #define URL_SIZE     256
@@ -37,7 +37,7 @@ static size_t write_response(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     struct write_result *result = (struct write_result *)stream;
 
-    if(result->pos + size * nmemb >= BUFFER_SIZE - 1)
+    if(result->pos + size * nmemb >= DMA_BUFFER_SIZE - 1)
     {
         fprintf(stderr, "error: too small buffer\n");
         return 0;
@@ -62,7 +62,7 @@ static char *request(const char *url)
     if(!curl)
         goto error;
 
-    data = malloc(BUFFER_SIZE);
+    data = malloc(DMA_BUFFER_SIZE);
     if(!data)
         goto error;
 
