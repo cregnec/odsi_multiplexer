@@ -79,7 +79,6 @@ isKernel (uint32_t cs)
 	return cs == 8;
 }
 
-
 uint32_t saveCaller(int_ctx_t *is)
 {
 	IAL_DEBUG(INFO, "Saving interrupted state matching registers at %x\r\n", is);
@@ -323,6 +322,7 @@ void yieldRootPartition(void)
 	dispatch2(getRootPartition(), 0, 0, 0, 0);
 }
 
+extern void* __kernel_end;
 /**
  * \fn genericHandler(registers_t regs)
  * \param regs Registers
@@ -334,6 +334,7 @@ genericHandler (int_ctx_t *is)
 	uint32_t vint, target, from, data1, data2;
 
 	data1 = 0;
+
 
 	/* A bit of the handling is different with hardware interrupts */
 	if(INT_IRQ(is->int_no))
@@ -358,6 +359,10 @@ genericHandler (int_ctx_t *is)
 			return;
 		}
 
+		if (is->eip < (uint32_t) &__kernel_end){
+			/* error should never happen */
+			for(;;);
+		}
 
 		/* Special case : root partition might be running - TODO : remove this when it gets stable */
 		/*if(PARTITION_CURRENT == PARTITION_ROOT)

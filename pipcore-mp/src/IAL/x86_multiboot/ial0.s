@@ -36,6 +36,8 @@
 global isr%1
 isr%1:
 	cli
+	; make sure cs value is 16 bits  is->cs &= 0xff;
+	and dword [esp+4], 0xff
 	push byte 0
 	push %1
 	jmp isrCommonStub
@@ -46,6 +48,8 @@ isr%1:
 global isr%1
 isr%1:
 	cli
+	; make sure cs value is 16 bits  is->cs &= 0xff;
+	and dword [esp+4], 0xff
 	push %1
 	jmp isrCommonStub
 %endmacro
@@ -55,6 +59,8 @@ isr%1:
 global irq%1
 irq%1:
 	cli
+	; make sure cs value is 16 bits  is->cs &= 0xff;
+	and dword [esp+4], 0xff
 	push byte 0
 	push byte %2
 	jmp irqCommonStub
