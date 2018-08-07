@@ -348,8 +348,8 @@ void initMmu()
 
     DEBUG(TRACE,"Mapping the kernel space");
     /* Map the kernel space */
-    uint32_t curAddr = 0;
-    extern uint32_t end, __kernel_end, __multiplexer, __krnstack;
+    extern uint32_t end, __code, __kernel_end, __multiplexer, __krnstack;
+    uint32_t curAddr = (uint32_t) &__code;
     DEBUG(TRACE,"Map kernel, stack up to root partition");
     /* Map kernel, stack up to root partition */
     while(curAddr < (uint32_t)(/* &end */ /* RAM_END */&__kernel_end))
