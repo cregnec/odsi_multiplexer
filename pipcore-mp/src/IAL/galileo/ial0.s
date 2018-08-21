@@ -49,7 +49,8 @@ global isr%1
 isr%1:
 	cli
 	; make sure cs value is 16 bits  is->cs &= 0xff;
-	and dword [esp+4], 0xff
+	; [esp+4] is error code
+	and dword [esp+8], 0xff
 	push %1
 	jmp isrCommonStub
 %endmacro
