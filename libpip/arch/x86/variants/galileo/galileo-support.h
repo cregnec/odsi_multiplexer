@@ -261,6 +261,7 @@ static uint32_t galileoSerialPortInitialized = FALSE;
 
 
 void galileoSerialPrintc(char c);
+void galileoSerialPrintWchar(uint16_t wchar);
 uint8_t galileoSerialGetc();
 void galileoSerialPrints(const char *string);
 

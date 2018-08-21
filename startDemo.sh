@@ -13,23 +13,31 @@ else
 fi
 
 
-make -C libpip/ VARIANT=virtual clean all || exit
 
 make -C libfreertos clean all || exit
 
+make -C ../lib_odsi_demo clean all || exit
+
 echo "Owner" && sleep 1
-make -C pipcore-mp/src/partitions/x86/owner/ all || exit
+make -C libpip/ VARIANT=virtual SERIAL_PORT=OWNER clean all || exit
+make -C pipcore-mp/src/partitions/x86/owner/ clean all || exit
 echo "sp1" && sleep 1
+make -C libpip/ VARIANT=virtual SERIAL_PORT=SP1 clean all || exit
 make -C pipcore-mp/src/partitions/x86/sp1Task/ all || exit
 echo "sp2" && sleep 1
+make -C libpip/ VARIANT=virtual SERIAL_PORT=SP2 clean all || exit
 make -C pipcore-mp/src/partitions/x86/sp2Task/ all || exit
 echo "sp3" && sleep 1
+make -C libpip/ VARIANT=virtual SERIAL_PORT=SP3 clean all || exit
 make -C pipcore-mp/src/partitions/x86/sp3Task/ all || exit
 echo "Network manager" && sleep 1
-make -C pipcore-mp/src/partitions/x86/NetworkMngr/ all || exit
+make -C libpip/ VARIANT=virtual SERIAL_PORT=NETWORK clean all || exit
+make -C pipcore-mp/src/partitions/x86/NetworkMngr/ clean all || exit
 echo "Secure partition" && sleep 1
+make -C libpip/ VARIANT=virtual SERIAL_PORT=SECURE clean all || exit
 make -C pipcore-mp/src/partitions/x86/secure/ all || exit
 echo "Normal partition" && sleep 1
+make -C libpip/ VARIANT=virtual SERIAL_PORT=NORMAL clean all || exit
 make -C pipcore-mp/src/partitions/x86/normal/ all || exit
 echo "Compilation des sous partition terminée" && sleep 1
 
@@ -39,7 +47,7 @@ yes | cp pipcore-mp/src/partitions/x86/sp2Task/pip-freertos.bin pipcore-mp/src/p
 yes | cp pipcore-mp/src/partitions/x86/sp3Task/pip-freertos.bin pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/Support_Files/partitions_images/part4.bin
 yes | cp pipcore-mp/src/partitions/x86/NetworkMngr/pip-freertos.bin pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/Support_Files/partitions_images/part5.bin
 
-
+make -C libpip/ VARIANT=virtual SERIAL_PORT=FREERTOS clean all || exit
 #make -C pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/ clean all
 make -B -C pipcore-mp/src/partitions/x86/pip-freertos/ all || exit
 
@@ -49,7 +57,7 @@ yes | cp pipcore-mp/src/partitions/x86/normal/normal.bin pipcore-mp/src/partitio
 
 if [ "$1" == "galileo" ]
 then
-    make -C libpip/ VARIANT=galileo clean all || exit
+    make -C libpip/ VARIANT=galileo SERIAL_PORT=MULTIPLEXER clean all || exit
 else
     make -C libpip/ clean all || exit
 fi

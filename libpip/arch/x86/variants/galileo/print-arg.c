@@ -38,6 +38,7 @@
 
 #include "pip/api.h"
 #include "pip/debug.h"
+#include "pip/serial.h"
 #include "pip/compat.h"
 #include <stdint.h>
 #include <stdarg.h>

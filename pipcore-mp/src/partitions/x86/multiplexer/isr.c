@@ -7,6 +7,8 @@
 #include <pip/paging.h>
 #include "scheduler.h"
 
+#define SPLIT_VIRTUAL_SERIAL_PORT 1
+
 uint32_t* irs_stack = NULL;
 extern uint32_t _phy_dma_page, _v_dma_page;
 
@@ -27,8 +29,14 @@ resume(caller, 0);
 
 INTERRUPT_HANDLER(virtualSerialRoutineAsm,virtualSerialRoutine)
 Pip_VCLI();
+#ifndef SPLIT_VIRTUAL_SERIAL_PORT
 char c = (char) data1 & 0xff;
 Pip_Debug_Putc(c);
+#else
+uint16_t wchar = (uint16_t) data1 & 0xffff;
+Pip_Debug_PutWchar(wchar);
+#endif
+
 //if there is a suspended sub partition in arg 'data2'
 if (data2) {
     Pip_Notify(caller, 0x81, data2, 0);

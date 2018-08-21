@@ -1,6 +1,7 @@
 # Architecture
 ARCH=x86
 VARIANT=default
+SERIAL_PORT=MULTIPLEXER
 
 # Directories
 SRCDIR=src arch/$(ARCH)/ arch/$(ARCH)/variants/$(VARIANT)/
@@ -24,6 +25,7 @@ VARIANTDEF=$(shell echo $(VARIANT) | tr a-z A-Z)
 CFLAGS+=-DARCH_$(ARCHDEF)
 CFLAGS+=-DVARIANT_$(VARIANTDEF)
 CFLAGS+=-DLOGLEVEL=TRACE
+CFLAGS+=-DVIRTUAL_SERIAL_PORT=$(SERIAL_PORT)
 
 .PHONY: info all
 
