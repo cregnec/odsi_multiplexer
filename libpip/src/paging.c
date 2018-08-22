@@ -31,10 +31,7 @@ int Pip_InitPaging(void *begin, void *end)
 	*(void**)b = (void*)0;
     nb_free_pages = c;
 
-    Pip_Debug_Puts("LibPip2 : Paging initialization complete. ");
-    Pip_Debug_PutDec(c);
-    Pip_Debug_Puts(" pages available.\r\n");
-
+    DEBUG(LOG, "LibPip2 : Paging initialization complete. %x  pages available.\r\n", c);
 	return 0;
 }
 
@@ -42,7 +39,7 @@ int Pip_InitPaging(void *begin, void *end)
 void* Pip_AllocPage(void)
 {
     if (nb_free_pages <=0){
-        Pip_Debug_Puts("LibPip2: no more free pages available\r\n");
+        DEBUG(ERROR, "LibPip2: no more free pages available\r\n");
         return NULL;
     }
     void* ret = Pager_FirstFreePage;

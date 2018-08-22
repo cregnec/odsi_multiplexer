@@ -16,18 +16,6 @@
 
 #include <stdint.h>
 
-/**
- * \brief Strings for debugging output.
- */
-enum {
-    CRITICAL =  0, //!< Critical output
-    ERROR =     1, //!< Error output
-    WARNING =   2, //!< Warning output
-    INFO =      3, //!< Information output
-    LOG =       4, //!< Log output
-    TRACE =     5 //!< Annoying, verbose output
-};
-
 #ifndef __pack
 #define __pack __attribute__((packed))
 #endif
