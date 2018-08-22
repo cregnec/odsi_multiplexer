@@ -78,12 +78,12 @@ SECTIONS
       _epartition_secure = . ;
   }
 
-    .partition_normal : ALIGN(4096)
+    .partition_fault : ALIGN(4096)
   {
-      _partition_normal = . ;
-      *(.normal)
+      _partition_fault = . ;
+      *(.fault)
       . = ALIGN(0x40000);
-      _epartition_normal = . ;
+      _epartition_fault = . ;
   }
 }
 

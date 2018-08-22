@@ -38,9 +38,9 @@ char* get_partition_name(int i)
         case SECURE:
             fprintf(stdout, "Partitition: SECURE ");
             return "SECURE";
-        case NORMAL:
-            fprintf(stdout, "Partitition: NORMAL ");
-            return "NORMAL";
+        case FAULT:
+            fprintf(stdout, "Partitition: FAULT");
+            return "FAULT";
         case OWNER:
             fprintf(stdout, "Partitition: OWNER ");
             return "OWNER";

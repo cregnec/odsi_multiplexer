@@ -13,7 +13,7 @@
 
 #define ADDR_TO_MAP 0xA000000
 #define MAX_PAGE 0x4000
-#define NORMAL_MAX_PAGE 0x1000
+#define FAULT_MAX_PAGE 0x1000
 #define SECURE_MAX_PAGE 0x1000
 #define LOAD_ADDR 0x700000
 
@@ -22,8 +22,8 @@ extern void* _partition_freertos, _epartition_freertos;
 extern void* _partition_secure, _epartition_secure;
 void *partitionEntry;
 
-extern void* _partition_normal, _epartition_normal;
-void *normalPartitionEntry;
+extern void* _partition_fault, _epartition_fault;
+void *faultPartitionEntry;
 
 uint32_t _phy_dma_page, _v_dma_page;
 
@@ -169,13 +169,13 @@ void main(uint32_t phy_dma_page, uint32_t v_dma_page)
 
     bind_partition_2_vcpu(freertos_partition, 1);
 
-    base=(uint32_t)&_partition_normal, length=(uint32_t)&_epartition_normal - base;
-    void *normal_partition = create_partition(LOAD_ADDR, base, length, ADDR_TO_MAP, NORMAL_MAX_PAGE);
-    if (!normal_partition){
-        printf("Failed to initialize normal partition\r\n");
+    base=(uint32_t)&_partition_fault, length=(uint32_t)&_epartition_fault - base;
+    void *fault_partition = create_partition(LOAD_ADDR, base, length, ADDR_TO_MAP, FAULT_MAX_PAGE);
+    if (!fault_partition){
+        printf("Failed to initialize fault partition\r\n");
         return;
     }
-    bind_partition_2_vcpu(normal_partition, 1);
+    bind_partition_2_vcpu(fault_partition, 1);
 
     base=(uint32_t)&_partition_secure, length=(uint32_t)&_epartition_secure - base;
     void* secure_partition = create_partition(LOAD_ADDR, base, length, ADDR_TO_MAP, SECURE_MAX_PAGE);

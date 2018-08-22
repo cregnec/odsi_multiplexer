@@ -7,7 +7,7 @@ enum virtual_serial_port {
     KERNEL = 0xf0,
     MULTIPLEXER,
     SECURE,
-    NORMAL,
+    FAULT,
     FREERTOS,
     OWNER,
     NETWORK,

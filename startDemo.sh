@@ -36,9 +36,9 @@ make -C pipcore-mp/src/partitions/x86/NetworkMngr/ clean all || exit
 echo "Secure partition" && sleep 1
 make -C libpip/ VARIANT=virtual SERIAL_PORT=SECURE clean all || exit
 make -C pipcore-mp/src/partitions/x86/secure/ all || exit
-echo "Normal partition" && sleep 1
-make -C libpip/ VARIANT=virtual SERIAL_PORT=NORMAL clean all || exit
-make -C pipcore-mp/src/partitions/x86/normal/ all || exit
+echo "Fault partition" && sleep 1
+make -C libpip/ VARIANT=virtual SERIAL_PORT=FAULT clean all || exit
+make -C pipcore-mp/src/partitions/x86/fault/ all || exit
 echo "Compilation des sous partition terminée" && sleep 1
 
 yes | cp pipcore-mp/src/partitions/x86/owner/pip-freertos.bin pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/Support_Files/partitions_images/part1.bin
@@ -53,7 +53,7 @@ make -B -C pipcore-mp/src/partitions/x86/pip-freertos/ all || exit
 
 yes | cp pipcore-mp/src/partitions/x86/pip-freertos/Demo/pip-kernel/Build/FreeRTOS.bin pipcore-mp/src/partitions/x86/multiplexer/pip-freertos.bin
 yes | cp pipcore-mp/src/partitions/x86/secure/secure.bin pipcore-mp/src/partitions/x86/multiplexer/secure.bin
-yes | cp pipcore-mp/src/partitions/x86/normal/normal.bin pipcore-mp/src/partitions/x86/multiplexer/normal.bin
+yes | cp pipcore-mp/src/partitions/x86/fault/fault.bin pipcore-mp/src/partitions/x86/multiplexer/fault.bin
 
 if [ "$1" == "galileo" ]
 then
@@ -62,12 +62,11 @@ else
     make -C libpip/ clean all || exit
 fi
 
-
 make -B -C pipcore-mp/src/partitions/x86/multiplexer || exit
 
 if [ "$1" == "galileo" ]
 then
-    make -C pipcore-mp TARGET=galileo PARTITION=multiplexer clean partition kernel
+    make -C pipcore-mp TARGET=galileo PARTITION=multiplexer clean kernel
 else
-    make -C pipcore-mp TARGET=x86_multiboot PARTITION=multiplexer clean partition kernel
+    make -C pipcore-mp TARGET=x86_multiboot PARTITION=multiplexer clean kernel
 fi

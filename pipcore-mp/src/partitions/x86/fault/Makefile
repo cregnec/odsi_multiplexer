@@ -37,6 +37,7 @@ LIBGCC=$(shell dirname $(shell gcc -print-libgcc-file-name -m32))
 LIBFREERTOS_LIB=$(LIBFREERTOS)/lib/
 LIBFREERTOS_INC=$(LIBFREERTOS)/include
 CFLAGS=-m32 -c -nostdlib --freestanding -I$(LIBPIP)/include/ -I$(LIBPIP)/arch/x86/include/ -I$(LIBFREERTOS_INC) -fno-pic -no-pie -fno-stack-protector
+CFLAGS+=-DLOGLEVEL=Warning
 ASFLAGS=$(CFLAGS)
 LDFLAGS=-L$(LIBPIP)/lib -L$(LIBGCC) -L$(LIBFREERTOS_LIB) -melf_i386 -Tlink.ld -lfreertos -lpip -lgcc
 
@@ -46,7 +47,7 @@ CSOURCES=$(wildcard *.c)
 ASOBJ=$(ASSOURCES:.s=.o)
 COBJ=$(CSOURCES:.c=.o)
 
-EXEC=normal.bin
+EXEC=fault.bin
 
 all: $(EXEC)
 	@echo Done.

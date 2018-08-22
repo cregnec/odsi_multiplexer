@@ -4,5 +4,5 @@
 .section .secure
 .INCBIN "secure.bin"
 
-.section .normal
-.INCBIN "normal.bin"
+.section .fault
+.INCBIN "fault.bin"
