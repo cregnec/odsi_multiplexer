@@ -140,7 +140,7 @@ void main(uint32_t phy_dma_page, uint32_t v_dma_page)
     parse_bootinfo(bootinfo);
 
     uint32_t paging = initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
-    LOGGER(INFO, "Initlializing vcpus\r\n");
+    LOGGER(LOG, "Initlializing vcpus\r\n");
     initialize_vcpu();
 
     LOGGER(LOG, "phy_dma_page: 0x%x, v_dma_page: 0x%x\r\n", phy_dma_page, v_dma_page);
@@ -150,6 +150,8 @@ void main(uint32_t phy_dma_page, uint32_t v_dma_page)
         LOGGER(ERROR, "Failed to initialize freertos partition\r\n");
         return;
     }
+    LOGGER(INFO, "Create FREERTOS partition: 0x%x\r\n", (uint32_t)freertos_partition);
+
     _phy_dma_page = phy_dma_page;
     _v_dma_page = v_dma_page;
     mapPageWrapper((uint32_t) 0xE00A1000, (uint32_t)freertos_partition, 0xE00A1000);
@@ -171,9 +173,10 @@ void main(uint32_t phy_dma_page, uint32_t v_dma_page)
     base=(uint32_t)&_partition_fault, length=(uint32_t)&_epartition_fault - base;
     void *fault_partition = create_partition(LOAD_ADDR, base, length, ADDR_TO_MAP, FAULT_MAX_PAGE);
     if (!fault_partition){
-        LOGGER(ERROR, "Failed to initialize normal partition\r\n");
+        LOGGER(ERROR, "Failed to initialize fault partition\r\n");
         return;
     }
+    LOGGER(INFO, "Create FAULT partition: 0x%x\r\n", (uint32_t)fault_partition);
     bind_partition_2_vcpu((uint32_t)fault_partition, 1);
 
     base=(uint32_t)&_partition_secure, length=(uint32_t)&_epartition_secure - base;
@@ -182,10 +185,11 @@ void main(uint32_t phy_dma_page, uint32_t v_dma_page)
         LOGGER(ERROR, "Failed to initialize Secure Partition\r\n");
         return;
     }
+    LOGGER(INFO, "Create SECURE partition: 0x%x\r\n", (uint32_t)secure_partition);
     bind_partition_2_vcpu((uint32_t)secure_partition, 1);
 
 
-    LOGGER(INFO, "Initlializing timer isr\r\n");
+    LOGGER(LOG, "Initlializing timer isr\r\n");
 
     init_isr();
 

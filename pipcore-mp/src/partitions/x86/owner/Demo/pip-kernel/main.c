@@ -135,15 +135,15 @@ volatile uint32_t ulCheckLoops = 0;
 void parse_bootinfo(pip_fpinfo* bootinfo)
 {
     if(bootinfo->magic == FPINFO_MAGIC)
-        printf("\tBootinfo seems to be correct.\r\n");
+        DEBUG(LOG, "\tBootinfo seems to be correct.\r\n");
     else {
-        printf("\tBootinfo is invalid. Aborting.\r\n");
+        DEBUG(ERROR, "\tBootinfo is invalid. Aborting.\r\n");
     }
 
-    printf("\tAvailable memory starts at 0x%x and ends at 0x%x\r\n",(uint32_t)bootinfo->membegin,      (uint32_t)bootinfo->memend);
+    DEBUG(LOG, "\tAvailable memory starts at 0x%x and ends at 0x%x\r\n",(uint32_t)bootinfo->membegin,      (uint32_t)bootinfo->memend);
 
 
-    printf("\tPip revision %s\r\n",bootinfo->revision);
+    DEBUG(LOG, "\tPip revision %s\r\n",bootinfo->revision);
     return;
 }
 
@@ -162,6 +162,8 @@ void od_Task()
 
 	eventinit(EventRequest);
 	eventinit(EventResponse);
+
+    DEBUG(INFO, "Waiting for requests\r\n");
 
 	for( ;; )
 	{
@@ -191,18 +193,19 @@ void main()
 	initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
 	initQueueService();
 
-	printf("Finished initializing somethings\r\n");
+    DEBUG(INFO, "Booting\r\n");
 
-	printf("Queues provided by my father \r\n");
+	DEBUG(LOG, "Finished initializing somethings\r\n");
+	DEBUG(LOG, "Queues provided by my father \r\n");
 	queueTab = pvPortMalloc(2*sizeof(uint32_t));
 
 	for(int i =1;i<=2;i++)
 	{
 		queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(int)*i);
-		printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
+		DEBUG(LOG, "\t\t\t\t\t%x\r\n", queueTab[i-1]);
 	}
 
-	printf("Starting OD task with %x\r\n",queueTab);
+	DEBUG(LOG, "Starting OD task with %x\r\n",queueTab);
 
 	od_Task();
 }

@@ -16,7 +16,7 @@ fi
 
 make -C libfreertos clean all || exit
 
-make -C ../lib_odsi_demo clean all || exit
+make -C ../lib_odsi_demo DEBUG=libpip clean all || exit
 
 echo "Owner" && sleep 1
 make -C libpip/ VARIANT=virtual SERIAL_PORT=OWNER clean all || exit

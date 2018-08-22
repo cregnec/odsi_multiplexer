@@ -97,6 +97,7 @@ CFLAGS+=$(MKARGS)
 
 # Compilation flags
 CFLAGS+= -m32 -g3 -Wall -Wextra -c -fmessage-length=0 -march=pentium -Wno-ignored-qualifiers -mno-ms-bitfields -ffunction-sections -ffreestanding -fomit-frame-pointer -fno-stack-protector -g -fno-pic -no-pie
+CFLAGS+=-DLOGLEVEL=Info
 
 # Assembler flags
 ASFLAGS=-I$(IA32DIR)

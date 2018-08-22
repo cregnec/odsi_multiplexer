@@ -149,16 +149,16 @@ volatile uint32_t ulCheckLoops = 0;
 void parse_bootinfo(pip_fpinfo* bootinfo)
 {
     if(bootinfo->magic == FPINFO_MAGIC)
-        printf("\tBootinfo seems to be correct.\r\n");
+        DEBUG(LOG, "\tBootinfo seems to be correct.\r\n");
     else {
-        printf("\tBootinfo is invalid. Aborting.\r\n");
+        DEBUG(ERROR, "\tBootinfo is invalid. Aborting.\r\n");
     }
 
 
-    printf("\tAvailable memory starts at 0x%x and ends at 0x%x\r\n",(uint32_t)bootinfo->membegin,      (uint32_t)bootinfo->memend);
+    DEBUG(LOG, "\tAvailable memory starts at 0x%x and ends at 0x%x\r\n",(uint32_t)bootinfo->membegin,      (uint32_t)bootinfo->memend);
 
 
-    printf("\tPip revision %s\r\n",bootinfo->revision);
+    DEBUG(LOG, "\tPip revision %s\r\n",bootinfo->revision);
     return;
 }
 
@@ -170,22 +170,23 @@ void main()
 {
 	pip_fpinfo * bootinfo = (pip_fpinfo*)0xFFFFC000;
 
+    DEBUG(INFO, "Bootinng\r\n");
 	//Get Bootinfo for the available memory
 	parse_bootinfo(bootinfo);
-	printf("Finished initializing somethings\r\n");
+	DEBUG(LOG, "Finished initializing somethings\r\n");
 
 	//Initialize the avaible pages
 	uint32_t paging = initPaging((void*)bootinfo->membegin,(void*)bootinfo->memend);
 	initQueueService();
 
-	printf("Queues provided by my father \r\n");
+	DEBUG(LOG, "Queues provided by my father \r\n");
 	uint32_t * queueTab = pvPortMalloc(7*sizeof(uint32_t));
 	for(int i =1; i<=7; i++){
 	  queueTab[i-1] = *(uint32_t*)( 0xFFFFA000+ sizeof(uint32_t)*i);
-	  printf("\t\t\t\t\t%x\r\n", queueTab[i-1]);
+	  DEBUG(LOG, "\t\t\t\t\t%x\r\n", queueTab[i-1]);
 	}
 
-	printf("Starting Network Manager task with %x\r\n",queueTab);
+	DEBUG(LOG, "Starting Network Manager task with %x\r\n",queueTab);
 
 	set_dma_buffer(queueTab[5]);
 	set_v_dma_buffer(queueTab[6]);
@@ -194,6 +195,7 @@ void main()
 
 	set_this_device_id(ODSI_DEMO_BOARD_A_UNIVERSAL_DEVICE_ID);
 
+    DEBUG(INFO, "Listening for incoming requests\r\n");
 	NW_Task(queueTab);
 	for(;;);
 }
