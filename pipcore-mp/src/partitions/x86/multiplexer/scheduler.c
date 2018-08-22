@@ -38,10 +38,10 @@ TASK* vcpu_runqueue_find(VCPU* vcpu, uint32_t partition)
 
 TASK* vcpu_runqueue_mapped(VCPU* vcpu, uint32_t vaddr)
 {
-    uint32_t test_page = (uint32_t) Pip_AllocPage();
+    void* test_page = Pip_AllocPage();
     TASK *runqueue = vcpu->task;
     while (runqueue){
-        if (!Pip_AddVAddr(test_page, runqueue->partition_entry, vaddr, 1, 1, 1)){
+        if (!Pip_AddVAddr((uint32_t)test_page, runqueue->partition_entry, vaddr, 1, 1, 1)){
             break;
         }
         runqueue = runqueue->next;

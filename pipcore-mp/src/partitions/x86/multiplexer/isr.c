@@ -1,9 +1,9 @@
-#include "stdlib.h"
-#include "stdio.h"
 #include <stdint.h>
+#include <stddef.h>
 #include <pip/api.h>
 #include <pip/vidt.h>
 #include <pip/debug.h>
+#include <pip/compat.h>
 #include <pip/paging.h>
 #include "scheduler.h"
 
@@ -19,11 +19,11 @@ schedule(caller);
 
 INTERRUPT_HANDLER(dmaAddressRoutineAsm,dmaAddressRoutine)
 Pip_VCLI();
-DEBUG(INFO, "Notify %x the dma address: 0x%x, 0x%x using page 0x%x\r\n", caller, _phy_dma_page, _v_dma_page, data1);
+DEBUG(LOG, "Notify %x the dma address: 0x%x, 0x%x using page 0x%x\r\n", caller, _phy_dma_page, _v_dma_page, data1);
 uint32_t* vaddr = (uint32_t *) Pip_RemoveVAddr(caller, data1);
 vaddr[0] = _phy_dma_page;
 vaddr[1] = _v_dma_page;
-Pip_AddVAddr(vaddr, caller, data1, 1, 1, 1);
+Pip_AddVAddr((uint32_t) vaddr, caller, data1, 1, 1, 1);
 resume(caller, 0);
 }
 
@@ -51,11 +51,11 @@ uint32_t vaddr = (uint32_t) Pip_RemoveVAddr(caller, data2);
 int_ctx_t* is = (int_ctx_t*) (vaddr | (data2 & 0xfff));
 Pip_AddVAddr(vaddr, caller, data2 & 0xfffff000, 1, 1, 1);
 if (is->int_no == 0xe){
-    DEBUG(ERROR, "Fault %x from 0x%x at 0x%x\r\n", is->int_no, caller, data1);
+    DEBUG(ERROR, "Fault %x from 0x%x at 0x%x, and it's no more under scheduling\r\n", is->int_no, caller, data1);
 } else {
     DEBUG(ERROR, "Fault %x from 0x%x\r\n", is->int_no, caller);
 }
-dumpRegs(is, ERROR);
+dumpRegs(is, LOG);
 mark_task_unrunnable(caller);
 schedule(0);
 }
@@ -64,16 +64,8 @@ void init_isr()
 {
     int i = 0;
     if (irs_stack == NULL) {
-        uint32_t page1 = Pip_AllocPage();
-        uint32_t page2 = Pip_AllocPage();
-        if (page1 + 0x1000 == page2) {
-            irs_stack = (uint32_t*) page2;
-        } else if (page2 + 0x1000 == page1) {
-            irs_stack = (uint32_t*) page1;
-        } else {
-          DEBUG(CRITICAL, "Two alloc page are not consecutive, not enought place for stack\r\n");
-        }
-        irs_stack = irs_stack + (0x1000/sizeof(uint32_t) - 1);
+        void* page1 = Pip_AllocPage();
+        irs_stack = (uint32_t*) page1 + (0x1000/sizeof(uint32_t) - 1);
         DEBUG(INFO, "Stack address is 0x%x\r\n", irs_stack);
     }
 
